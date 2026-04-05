@@ -27,7 +27,7 @@ def split_with_greatest_inf_gain(data, labels):
             arr_idx = idx
     return arr_idx
 
-def tree(data: np.array, labels: np.array, depth=0, max_depth=3):
+def tree(data: np.ndarray, labels: np.ndarray, depth=0, max_depth=3):
     if entropy(labels) == 0:
         return labels[0]
     if depth == max_depth:
@@ -53,7 +53,8 @@ data = np.array([
     [0, 1, 1, 1],
     [1, 0, 0, 0],
     [1, 0, 1, 0],
-    [0, 0, 0, 0]
+    [0, 0, 0, 0],
+    [1, 1, 1, 1]
 ])
-labels = np.array([1, 0, 1, 0])
+labels = np.array([1, 0, 1, 0, 0])
 print(f'tree: {tree(data, labels)}')
