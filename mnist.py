@@ -32,9 +32,9 @@ test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
 # set the device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # cuda: 168.66, cpu: 170.79, collab cuda: 181.86, collab cpu: 180.45
-device = torch.device("cpu")
+# device = torch.device("cpu")
 print(device)
-# print(torch.cuda.is_available())
+print(torch.cuda.is_available())
 # print(torch.cuda.device_count())
 # print(torch.version.cuda)
 # print(torch.__version__)
