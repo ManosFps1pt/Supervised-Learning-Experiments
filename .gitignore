@@ -1,0 +1,13 @@
+# Data
+data/
+
+challenges/data/
+
+# Python
+__pycache__/
+.mypy_cache/
+.venv/
+
+# Ide
+.idea/
+

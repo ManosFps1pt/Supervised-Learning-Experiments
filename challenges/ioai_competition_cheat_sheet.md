@@ -149,9 +149,15 @@ optimizer = optim.Adam(model.parameters(), lr=1e-3)
 train_dataset = TensorDataset(torch.tensor(X_train_scaled).float(), torch.tensor(y_train.values).long())
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 
-# Training Loop
+# Training Loop with Validation and Best Model Checkpointing
+import copy
+
 epochs = 10
+best_accuracy = 0.0
+best_model_wts = copy.deepcopy(model.state_dict())
+
 for epoch in range(epochs):
+    # --- Training Phase ---
     model.train() # Set to training mode (enables Dropout/BatchNorm)
     running_loss = 0.0
     for batch_X, batch_y in train_loader:
@@ -164,8 +170,40 @@ for epoch in range(epochs):
         optimizer.step()                # 5. Update weights
       
         running_loss += loss.item()
+        
+    train_loss = running_loss / len(train_loader)
+    
+    # --- Validation Phase ---
+    # (Assuming you have a 'val_loader' created similarly to 'train_loader')
+    model.eval() # Set to evaluation mode
+    val_loss = 0.0
+    correct = 0
+    total = 0
+    with torch.no_grad(): # Disable gradient calculation for validation
+        for batch_X, batch_y in train_loader: # Replace with val_loader in your real code
+            batch_X, batch_y = batch_X.to(device), batch_y.to(device)
+            outputs = model(batch_X)
+            loss = criterion(outputs, batch_y)
+            val_loss += loss.item()
+            
+            # Accuracy calculation
+            _, predicted = torch.max(outputs.data, 1)
+            total += batch_y.size(0)
+            correct += (predicted == batch_y).sum().item()
+            
+    val_loss = val_loss / len(train_loader) # Replace with len(val_loader)
+    val_accuracy = correct / total
+    
+    # --- Save Best Model ---
+    if val_accuracy > best_accuracy:
+        best_accuracy = val_accuracy
+        best_model_wts = copy.deepcopy(model.state_dict())
   
-    print(f"Epoch {epoch+1}/{epochs} - Loss: {running_loss/len(train_loader):.4f}")
+    print(f"Epoch {epoch+1}/{epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f} | Val Acc: {val_accuracy:.4f}")
+
+# Load the best weights back into the model after training finishes
+model.load_state_dict(best_model_wts)
+print(f"Training complete. Best Validation Accuracy: {best_accuracy:.4f}")
 ```
 
 ---
