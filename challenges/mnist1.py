@@ -12,9 +12,6 @@ train_ds = datasets.MNIST(root="./data", download=True, transform=transform, tra
 test_ds = datasets.MNIST(root="./data", download=True, transform=transform, train=False)
 
 # %%
-
-
-# %%
 t_ds = datasets.MNIST(root="./data", download=True, transform=transform, train=False)
 
 # %%
@@ -94,6 +91,7 @@ class Net(nn.Module):
         self.fc3 = nn.Linear(64, 10)
 
     def forward(self, x):
+        x = x.view(x.size(0), -1)
         x = self.fc1(x)
         x = torch.relu(x)
         x = self.fc2(x)
@@ -102,13 +100,41 @@ class Net(nn.Module):
         return x
 
 # %%
-device = "cuda" if torch.cuda.is_available() else "cpu"
-trainLoader = DataLoader(train_ds, batch_size=32)
-testLoader = DataLoader(test_ds, batch_size=32)
-model = Net().to(device)
-optimizer = optim.Adam(model.parameters(), 1e-3)
-epochs = 10
-criterion = nn.CrossEntropyLoss()
+class Net2(nn.Module):
+    def __init__(self):
+        super(Net2, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, stride=1, padding=1)
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv2 = nn.Conv2d(in_channels=32, out_channels=16, kernel_size=2, stride=2, padding=1)
+        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.fc1 = nn.Linear(256, 512)
+        self.fc2 = nn.Linear(512, 128)
+        self.fc3 = nn.Linear(128, 10)
+
+    def forward(self, x):
+        # x = x.view(x.size(0), -1)
+        # print(x.shape)
+        x = self.conv1(x)
+        x = torch.relu(x)
+        # print(x.shape)
+        x = self.pool1(x)
+        # print(x.shape)
+        x = self.conv2(x)
+        # print(x.shape)
+        x = torch.relu(x)
+        x = self.pool2(x)
+        # print(x.shape)
+        x = x.view(x.size(0), -1) # x.size(0) is the batch size
+        # print(x.shape)
+        x = self.fc1(x)
+        x = torch.relu(x)
+        x = self.fc2(x)
+        x = torch.relu(x)
+        x = self.fc3(x)
+        return x
+
+# %%
+
 
 # %%
 import copy
@@ -119,7 +145,7 @@ def train(model, epochs, optimizer, train_loader, test_loader, criterion, device
         model.train()
         running_loss = 0.0
         for batch_X, batch_y in train_loader:
-            batch_X = batch_X.reshape(batch_X.size(0), -1)
+            # batch_X = batch_X.reshape(batch_X.size(0), -1)
             batch_X, batch_y = batch_X.to(device), batch_y.to(device)
             optimizer.zero_grad()
             outputs = model(batch_X)
@@ -135,7 +161,6 @@ def train(model, epochs, optimizer, train_loader, test_loader, criterion, device
         total = 0   
         with torch.no_grad():
             for batch_X, batch_y in test_loader:
-                batch_X = batch_X.reshape(batch_X.size(0), -1)
                 batch_X, batch_y = batch_X.to(device), batch_y.to(device)
                 outputs = model(batch_X)
                 loss = criterion(outputs, batch_y)
@@ -144,7 +169,7 @@ def train(model, epochs, optimizer, train_loader, test_loader, criterion, device
                 _, predicted = torch.max(outputs.data, 1)
                 total += batch_y.size(0)
                 correct += (predicted == batch_y).sum().item()
-        val_loss = val_loss / len(test_loader)
+        val_loss = val_loss / len(train_loader) # Replace with len(val_loader)
         val_accuracy = correct / total
         
         # --- Save Best Model ---
@@ -155,6 +180,27 @@ def train(model, epochs, optimizer, train_loader, test_loader, criterion, device
         print(f"Epoch: {epoch+1}/{epochs}\tTrain Loss: {train_loss:.4f}\tVal Loss: {val_loss:.4f}\tVal Acc: {val_accuracy:.4f}")
     model.load_state_dict(best_model_wts)
     print(f"Training complete. Best Validation Accuracy: {best_accuracy:.4f}")
+
+# %%
+device = "cuda" if torch.cuda.is_available() else "cpu"
+trainLoader = DataLoader(train_ds, batch_size=32)
+testLoader = DataLoader(test_ds, batch_size=32)
+model = Net().to(device)
+optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+epochs = 10
+criterion = nn.CrossEntropyLoss()
+
+# %%
+train(model, epochs, optimizer, trainLoader, testLoader, criterion, device)
+
+# %%
+device = "cuda" if torch.cuda.is_available() else "cpu"
+trainLoader = DataLoader(train_ds, batch_size=32)
+testLoader = DataLoader(test_ds, batch_size=32)
+model = Net2().to(device)
+optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+epochs = 10
+criterion = nn.CrossEntropyLoss()
 
 # %%
 train(model, epochs, optimizer, trainLoader, testLoader, criterion, device)
