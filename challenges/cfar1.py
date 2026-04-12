@@ -5,6 +5,7 @@ import torchvision.transforms as T
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import torch.optim as optim
+import torchinfo
 
 # %%
 transform_train = T.Compose([
@@ -17,7 +18,6 @@ transform_test = T.Compose([
     T.ToTensor(),
     T.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261))
 ])
-
 train_ds = datasets.CIFAR10("./data", train=True, transform=transform_train, download=True)
 test_ds = datasets.CIFAR10("./data", train=False, transform=transform_test, download=True)
 
@@ -25,24 +25,40 @@ test_ds = datasets.CIFAR10("./data", train=False, transform=transform_test, down
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1)
-        self.conv3 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, padding=1)
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
-        
-        self.fc1 = nn.Linear(2048 * 4 * 4, 512)
-        self.fc2 = nn.Linear(512, 128)
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=64, padding=1, kernel_size=3)
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv2 = nn.Conv2d(in_channels=64, out_channels=128, padding=1, kernel_size=3)
+        self.conv3 = nn.Conv2d(in_channels=128, out_channels=256, padding=1, kernel_size=3)
+        self.conv4 = nn.Conv2d(in_channels=256, out_channels=512, padding=1, kernel_size=3)
+        self.pool2 = nn.AdaptiveAvgPool2d(1)
+        self.fc1 = nn.Linear(512, 1024)
+        self.fc2 = nn.Linear(1024, 128)
         self.fc3 = nn.Linear(128, 10)
 
     def forward(self, x):
-        x = self.pool(torch.relu(self.conv1(x)))
-        x = self.pool(torch.relu(self.conv2(x)))
-        x = self.pool(torch.relu(self.conv3(x)))
-        
+        # print(x.shape)
+        x = self.conv1(x)
+        x = torch.relu(x)
+        # print(x.shape)
+        x = self.pool1(x)
+        # print(x.shape)
+        x = self.conv2(x)
+        x = torch.relu(x)
+        # print(x.shape)
+        x = self.pool1(x)
+        # print(x.shape)
+        x = self.conv3(x)
+        x = torch.relu(x)
+        x = self.conv4(x)
+        # print(x.shape)
+        x = self.pool2(x)
         x = x.view(x.size(0), -1)
-        
-        x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
+        # print(x.shape)
+        x = self.fc1(x)
+        x = torch.relu(x)
+        # print(x.shape)
+        x = self.fc2(x)
+        x = torch.relu(x)
         x = self.fc3(x)
         return x
 
@@ -79,7 +95,7 @@ def train(model, epochs, optimizer, train_loader, test_loader, criterion, device
                 _, predicted = torch.max(outputs.data, 1)
                 total += batch_y.size(0)
                 correct += (predicted == batch_y).sum().item()
-        val_loss = val_loss / len(test_loader)
+        val_loss = val_loss / len(train_loader) # Replace with len(val_loader)
         val_accuracy = correct / total
         
         # --- Save Best Model ---
@@ -94,12 +110,16 @@ def train(model, epochs, optimizer, train_loader, test_loader, criterion, device
 # %%
 batch_size = 32
 epochs = 10
-train_loader = DataLoader(train_ds, batch_size=batch_size)
-test_loader = DataLoader(test_ds, batch_size=batch_size)
+train_loader = DataLoader(train_ds, batch_size=batch_size, num_workers=4)
+test_loader = DataLoader(test_ds, batch_size=batch_size, num_workers=4)
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model = Net().to(device)
-optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
+optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 criterion = nn.CrossEntropyLoss()
+
+# %%
+from torchinfo import summary
+summary(model)
 
 # %%
 train(model, epochs, optimizer, train_loader, test_loader, criterion, device)
