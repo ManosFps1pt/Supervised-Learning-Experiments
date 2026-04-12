@@ -143,11 +143,16 @@ class SimpleMLP(nn.Module):
 
 model = SimpleMLP(input_dim=X_train_scaled.shape[1], output_dim=2).to(device)
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=1e-3)
+# Add weight_decay for L2 Regularization to prevent overfitting!
+optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 
-# Dataloaders (assuming X_train, y_train are numpy arrays)
+# Dataloaders (assuming X_train, y_train are numpy arrays/pandas series)
 train_dataset = TensorDataset(torch.tensor(X_train_scaled).float(), torch.tensor(y_train.values).long())
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+val_dataset = TensorDataset(torch.tensor(X_test_scaled).float(), torch.tensor(y_test.values).long())
+
+# OPTIMIZATION TIP: Use pin_memory=True and num_workers > 0 for much faster data transfer!
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4, pin_memory=True, persistent_workers=True)
+val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=4, pin_memory=True, persistent_workers=True)
 
 # Training Loop with Validation and Best Model Checkpointing
 import copy
@@ -174,14 +179,15 @@ for epoch in range(epochs):
     train_loss = running_loss / len(train_loader)
     
     # --- Validation Phase ---
-    # (Assuming you have a 'val_loader' created similarly to 'train_loader')
     model.eval() # Set to evaluation mode
     val_loss = 0.0
     correct = 0
     total = 0
     with torch.no_grad(): # Disable gradient calculation for validation
-        for batch_X, batch_y in train_loader: # Replace with val_loader in your real code
-            batch_X, batch_y = batch_X.to(device), batch_y.to(device)
+        for batch_X, batch_y in val_loader:
+            # non_blocking=True speeds up memory transfer when using pinned memory
+            batch_X = batch_X.to(device, non_blocking=True)
+            batch_y = batch_y.to(device, non_blocking=True)
             outputs = model(batch_X)
             loss = criterion(outputs, batch_y)
             val_loss += loss.item()
@@ -191,7 +197,7 @@ for epoch in range(epochs):
             total += batch_y.size(0)
             correct += (predicted == batch_y).sum().item()
             
-    val_loss = val_loss / len(train_loader) # Replace with len(val_loader)
+    val_loss = val_loss / len(val_loader)
     val_accuracy = correct / total
     
     # --- Save Best Model ---
@@ -236,6 +242,49 @@ val_transforms = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
+```
+
+### CNN PyTorch Class Template
+
+```python
+import torch.nn as nn
+import torch
+
+class SimpleCNN(nn.Module):
+    def __init__(self, num_classes=10):
+        super(SimpleCNN, self).__init__()
+        # Input: 3 channels (e.g. RGB) -> 64 filters
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=64, padding=1, kernel_size=3)
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv2 = nn.Conv2d(in_channels=64, out_channels=128, padding=1, kernel_size=3)
+        self.conv3 = nn.Conv2d(in_channels=128, out_channels=256, padding=1, kernel_size=3)
+        self.conv4 = nn.Conv2d(in_channels=256, out_channels=512, padding=1, kernel_size=3)
+        
+        # Adaptive pooling allows for arbitrary input image sizes
+        self.pool2 = nn.AdaptiveAvgPool2d(1)
+        
+        self.fc1 = nn.Linear(512, 1024)
+        self.fc2 = nn.Linear(1024, 128)
+        self.fc3 = nn.Linear(128, num_classes)
+
+    def forward(self, x):
+        x = torch.relu(self.conv1(x))
+        x = self.pool1(x)
+        x = torch.relu(self.conv2(x))
+        x = self.pool1(x)
+        x = torch.relu(self.conv3(x))
+        x = self.conv4(x)
+        x = self.pool2(x)
+        x = x.view(x.size(0), -1) # Flatten
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+
+# Tip: Use torchinfo to verify layer shapes and parameters!
+# from torchinfo import summary
+# model = SimpleCNN()
+# summary(model, input_size=(1, 3, 32, 32)) 
 ```
 
 ### Transfer Learning (ResNet)

@@ -87,7 +87,8 @@ def train(model, epochs, optimizer, train_loader, test_loader, criterion, device
         total = 0   
         with torch.no_grad():
             for batch_X, batch_y in test_loader:
-                batch_X, batch_y = batch_X.to(device), batch_y.to(device)
+                batch_X = batch_X.to(device, non_blocking=True)
+                batch_y = batch_y.to(device, non_blocking=True)
                 outputs = model(batch_X)
                 loss = criterion(outputs, batch_y)
                 val_loss += loss.item()
@@ -95,7 +96,7 @@ def train(model, epochs, optimizer, train_loader, test_loader, criterion, device
                 _, predicted = torch.max(outputs.data, 1)
                 total += batch_y.size(0)
                 correct += (predicted == batch_y).sum().item()
-        val_loss = val_loss / len(train_loader) # Replace with len(val_loader)
+        val_loss = val_loss / len(test_loader) # Replace with len(val_loader)
         val_accuracy = correct / total
         
         # --- Save Best Model ---
@@ -108,11 +109,28 @@ def train(model, epochs, optimizer, train_loader, test_loader, criterion, device
     print(f"Training complete. Best Validation Accuracy: {best_accuracy:.4f}")
 
 # %%
-batch_size = 32
-epochs = 10
-train_loader = DataLoader(train_ds, batch_size=batch_size, num_workers=4)
-test_loader = DataLoader(test_ds, batch_size=batch_size, num_workers=4)
 device = "cuda" if torch.cuda.is_available() else "cpu"
+print(device)
+batch_size = 256
+epochs = 60
+
+
+# %%
+train_loader = DataLoader(
+    train_ds,
+    batch_size=batch_size,
+    num_workers=8,
+    pin_memory=True,
+    persistent_workers=True
+)
+
+test_loader = DataLoader(
+    test_ds,
+    batch_size=batch_size,
+    num_workers=8,
+    pin_memory=True,
+    persistent_workers=True
+)
 model = Net().to(device)
 optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 criterion = nn.CrossEntropyLoss()
