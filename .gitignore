@@ -1,13 +1,23 @@
+# Supervised Learning Experiments
+results/
+challenges/results/
+my_bert_sentiment/
+challenges/my_bert_sentiment/
+
 # Data
 data/
-
 challenges/data/
 
 # Python
 __pycache__/
 .mypy_cache/
 .venv/
+*.pyc
 
-# Ide
+# IDE
 .idea/
+.vscode/
 
+# Logs/Artifacts
+wandb/
+runs/
