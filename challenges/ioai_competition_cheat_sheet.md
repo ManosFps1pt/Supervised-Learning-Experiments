@@ -379,8 +379,71 @@ print(probs) # Probabilities corresponding to labels
 ```
 
 ---
-
-## 🛠️ Debugging Checklist for the Competition
+ 
+ ## 7. 🛡️ Adversarial Robustness & Attacks
+ 
+ **Theory:** 
+ - **Adversarial Examples:** Inputs to a model that are specifically designed to cause misclassification, often imperceptible to humans.
+ - **Targeted Attack:** Force the model to predict a specific *wrong* class.
+ - **Untargeted Attack:** Force the model to predict *anything* other than the correct class.
+ - **L1 Sparse Attack:** Modifies the fewest number of pixels possible to flip the prediction.
+ 
+ ### Targeted L1 Sparse Attack Template
+ ```python
+ def targeted_attack(model, image, target_class, pixels_per_iter=1):
+     model.eval()
+     # 1. Create a clean copy that tracks gradients
+     adv = image.clone().detach().requires_grad_(True)
+     
+     for i in range(100): # Iteration loop
+         output = model(adv.clamp(0, 255)) # Keep image in valid range
+         pred = output.argmax(dim=1)
+         
+         if pred.item() == target_class:
+             break # Attack Succeeded!
+             
+         # 2. Calculate Loss based on the TARGET
+         loss = F.cross_entropy(output, torch.tensor([target_class]))
+         model.zero_grad()
+         loss.backward() # Compute gradients
+         
+         # 3. Find the most influential pixels (Highest Gradient)
+         grad = adv.grad.detach()
+         indices = torch.argsort(grad.view(-1).abs(), descending=True)
+         
+         # 4. Modify top pixels by 1 unit
+         with torch.no_grad():
+             for idx in indices[:pixels_per_iter]:
+                 # If gradient is positive, decreasing pixel value lowers target loss
+                 step = -1 if grad.view(-1)[idx] > 0 else 1
+                 adv.view(-1)[idx] += step
+         
+         adv = adv.detach().requires_grad_(True) # Reset for next loop
+     return adv
+ ```
+ 
+ ---
+ 
+ ## 8. 🛠️ Tensor Swiss Army Knife (Pro-Tips)
+ 
+ These functions are essential for manual gradient manipulation and image processing.
+ 
+ | Function | Usage | Why use it? |
+ | :--- | :--- | :--- |
+ | `.clone()` | `new = x.clone()` | Creates a deep copy. Changes to `new` won't affect `x`. |
+ | `.detach()` | `x_clean = x.detach()` | Stops gradient tracking. Prevents "In-place modification" errors. |
+ | `.float()` | `x = x.float()` | Converts to float (required for gradients/loss calc). |
+ | `.requires_grad_()` | `x.requires_grad_(True)` | Starts tracking operations on this tensor for `.backward()`. |
+ | `.squeeze()` | `model(x.squeeze())` | Removes dimensions of size 1 (e.g., `[1, 112, 112]` -> `[112, 112]`). |
+ | `.view(-1)` | `flat = x.view(-1)` | Flattens the tensor into a 1D array (useful for `.argsort()`). |
+ | `.argsort()` | `idx = grad.argsort()` | Returns the indices that would sort the tensor (finds "highest impact" pixels). |
+ | `.clamp(0, 255)` | `img.clamp(0, 255)` | Ensures values stay within valid image range (0-255). |
+ | `.round()` | `img.round()` | Rounds to nearest integer (important before `toInt` or submission). |
+ | `.item()` | `val = loss.item()` | Extracts a single Python number from a 1x1 tensor. |
+ 
+ ---
+ 
+ ## 🛠️ Debugging Checklist for the Competition
 
 - [ ] **Loss isn't decreasing?** Check your Learning Rate. It might be too high (exploding) or too low (frozen). Try $1e-3$ or $1e-4$.
 - [ ] **Shape Mismatch Error?** Print `.shape` on your inputs right before the forward pass.

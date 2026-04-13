@@ -65,12 +65,18 @@ This optimized plan is designed for a fast-learning 16-year-old with 1 week to p
   - 2. Use a Hugging Face API or pre-trained model to run basic Audio transcription (Whisper) or zero-shot image classification (CLIP).
 - **Notes to write:** API/Pre-trained model loading snippet for Whisper/CLIP.
 
-## Day 7 — Competition Strategy & Speed Run
+## Day 7 — Competition Strategy & Speed Run (Adversarial Robustness)
 
 - **Dataset:** Fashion-MNIST or a Kaggle Playground tabular dataset.
-- **Concepts:** Hyperparameter tuning, generating adversarial examples, rapid iterations.
-- **Action:** Do a complete timed "mock competition." Give yourself 4 hours to build a baseline, tune it, submit, and analyze mistakes.
-- **Notes to write:** Debugging checklist, hyperparameter tuning tricks, final Model Selection cheat sheet.
+- **Concepts:** Hyperparameter tuning, rapid iterations, and **Adversarial Robustness**.
+- **Adversarial Focus (New):**
+  - *Theory:* Targeted vs Untargeted attacks (failing the model on purpose).
+  - *The Toolbelt:* Deep dive into "Tensor Swiss Army Knife" functions (`.clone()`, `.detach()`, `.view(-1)`, `.argsort()`).
+  - *L1 Sparse Attack:* Learning to flip a class by changing the minimum number of pixels using gradients.
+- **Action:** 
+  - 1. Perform a targeted attack on a pre-trained model to change a "neutral" prediction to "happy" with minimal L1 distance.
+  - 2. Do a complete timed "mock competition." Give yourself 4 hours to build a baseline, tune it, and analyze mistakes.
+- **Notes to write:** Debugging checklist, hyperparameter tuning tricks, **Adversarial Attack snippets**, and the Tensor Swiss Army Knife table.
 
 ---
 
