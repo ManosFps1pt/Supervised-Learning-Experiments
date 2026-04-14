@@ -3,6 +3,12 @@ results/
 challenges/results/
 my_bert_sentiment/
 challenges/my_bert_sentiment/
+challenges/deepfakes/
+challenges/test/
+challenges/deepfakes.zip
+challenges/test.zip
+challenges/answers.json
+
 
 # Data
 data/
