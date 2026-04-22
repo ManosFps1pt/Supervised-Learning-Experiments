@@ -167,17 +167,17 @@ for epoch in range(epochs):
     running_loss = 0.0
     for batch_X, batch_y in train_loader:
         batch_X, batch_y = batch_X.to(device), batch_y.to(device)
-      
+  
         optimizer.zero_grad()           # 1. Zero gradients
         outputs = model(batch_X)        # 2. Forward pass
         loss = criterion(outputs, batch_y) # 3. Compute loss
         loss.backward()                 # 4. Backward pass
         optimizer.step()                # 5. Update weights
-      
+  
         running_loss += loss.item()
-        
-    train_loss = running_loss / len(train_loader)
     
+    train_loss = running_loss / len(train_loader)
+  
     # --- Validation Phase ---
     model.eval() # Set to evaluation mode
     val_loss = 0.0
@@ -191,15 +191,15 @@ for epoch in range(epochs):
             outputs = model(batch_X)
             loss = criterion(outputs, batch_y)
             val_loss += loss.item()
-            
+        
             # Accuracy calculation
             _, predicted = torch.max(outputs.data, 1)
             total += batch_y.size(0)
             correct += (predicted == batch_y).sum().item()
-            
+        
     val_loss = val_loss / len(val_loader)
     val_accuracy = correct / total
-    
+  
     # --- Save Best Model ---
     if val_accuracy > best_accuracy:
         best_accuracy = val_accuracy
@@ -259,10 +259,10 @@ class SimpleCNN(nn.Module):
         self.conv2 = nn.Conv2d(in_channels=64, out_channels=128, padding=1, kernel_size=3)
         self.conv3 = nn.Conv2d(in_channels=128, out_channels=256, padding=1, kernel_size=3)
         self.conv4 = nn.Conv2d(in_channels=256, out_channels=512, padding=1, kernel_size=3)
-        
+    
         # Adaptive pooling allows for arbitrary input image sizes
         self.pool2 = nn.AdaptiveAvgPool2d(1)
-        
+    
         self.fc1 = nn.Linear(512, 1024)
         self.fc2 = nn.Linear(1024, 128)
         self.fc3 = nn.Linear(128, num_classes)
@@ -310,140 +310,55 @@ resnet = resnet.to(device)
 
 ---
 
-## 5. 🗣️ NLP & Transformers (Hugging Face)
+## 5. 🔠 Embeddings
 
 **Theory:**
 
-- Text must be tokenized before passing to a model. The tokenizer and model MUST match exactly.
-- BERT is great for classification. Generative (causal) models like GPT are for text generation.
+- Neural networks only understand numbers. To pass text (or categorical data) to a model, we map tokens to dense vectors called **Embeddings**.
+- Words with similar meanings will have embeddings that are mathematically close.
+- We must **tokenize** text (map to integer IDs) before applying an embedding layer.
 
-### Quick Pipeline (Zero-resource)
-
-```python
-from transformers import pipeline
-
-# Sentiment Analysis / Text Classification pipeline out-of-the-box
-classifier = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
-print(classifier("This competition is awesome!"))
-```
-
-### Fine-Tuning Setup Snippet
+### PyTorch Embedding Layer Snippet
 
 ```python
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+import torch.nn as nn
 
-model_link = "distilbert-base-uncased"
-tokenizer = AutoTokenizer.from_pretrained(model_link)
-model = AutoModelForSequenceClassification.from_pretrained(model_link, num_labels=2).to(device)
+vocab_size = 1000  # Number of unique tokens
+embed_dim = 128    # Dimension of the embedding vector
 
-text = ["I love AI", "Debugging is hard"]
-# Padding and truncation are essential for batches
-inputs = tokenizer(text, padding=True, truncation=True, return_tensors="pt").to(device)
+embedding_layer = nn.Embedding(num_embeddings=vocab_size, embedding_dim=embed_dim)
 
-outputs = model(**inputs)
-predictions = torch.argmax(outputs.logits, dim=-1)
+# Input: Batch of 2 sentences, padded to length 5
+input_ids = torch.tensor([[10, 400, 22, 5, 999], 
+                          [0, 12, 45, 1, 9]])
+
+embedded_output = embedding_layer(input_ids)
+print(embedded_output.shape) # Output shape: (2, 5, 128)
 ```
 
 ---
 
-## 6. 🎧 Audio & Advanced (Hugging Face)
+## 8. 🛠️ Tensor Swiss Army Knife (Pro-Tips)
 
-### Whisper (Audio Transcription)
-
-```python
-from transformers import pipeline
-
-transcriber = pipeline("automatic-speech-recognition", model="openai/whisper-tiny.en")
-result = transcriber("audio_file.wav")
-print(result["text"])
-```
-
-### CLIP (Zero-Shot Image Classification)
-
-```python
-from transformers import CLIPProcessor, CLIPModel
-from PIL import Image
-
-model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
-
-image = Image.open("image.jpg")
-labels = ["a cat", "a dog", "a machine learning model"]
-
-# Predict which text matches the image
-inputs = processor(text=labels, images=image, return_tensors="pt", padding=True)
-outputs = model(**inputs)
-probs = outputs.logits_per_image.softmax(dim=1) 
-
-print(probs) # Probabilities corresponding to labels
-```
-
----
- 
- ## 7. 🛡️ Adversarial Robustness & Attacks
- 
- **Theory:** 
- - **Adversarial Examples:** Inputs to a model that are specifically designed to cause misclassification, often imperceptible to humans.
- - **Targeted Attack:** Force the model to predict a specific *wrong* class.
- - **Untargeted Attack:** Force the model to predict *anything* other than the correct class.
- - **L1 Sparse Attack:** Modifies the fewest number of pixels possible to flip the prediction.
- 
- ### Targeted L1 Sparse Attack Template
- ```python
- def targeted_attack(model, image, target_class, pixels_per_iter=1):
-     model.eval()
-     # 1. Create a clean copy that tracks gradients
-     adv = image.clone().detach().requires_grad_(True)
-     
-     for i in range(100): # Iteration loop
-         output = model(adv.clamp(0, 255)) # Keep image in valid range
-         pred = output.argmax(dim=1)
-         
-         if pred.item() == target_class:
-             break # Attack Succeeded!
-             
-         # 2. Calculate Loss based on the TARGET
-         loss = F.cross_entropy(output, torch.tensor([target_class]))
-         model.zero_grad()
-         loss.backward() # Compute gradients
-         
-         # 3. Find the most influential pixels (Highest Gradient)
-         grad = adv.grad.detach()
-         indices = torch.argsort(grad.view(-1).abs(), descending=True)
-         
-         # 4. Modify top pixels by 1 unit
-         with torch.no_grad():
-             for idx in indices[:pixels_per_iter]:
-                 # If gradient is positive, decreasing pixel value lowers target loss
-                 step = -1 if grad.view(-1)[idx] > 0 else 1
-                 adv.view(-1)[idx] += step
-         
-         adv = adv.detach().requires_grad_(True) # Reset for next loop
-     return adv
- ```
- 
- ---
- 
- ## 8. 🛠️ Tensor Swiss Army Knife (Pro-Tips)
- 
  These functions are essential for manual gradient manipulation and image processing.
- 
- | Function | Usage | Why use it? |
- | :--- | :--- | :--- |
- | `.clone()` | `new = x.clone()` | Creates a deep copy. Changes to `new` won't affect `x`. |
- | `.detach()` | `x_clean = x.detach()` | Stops gradient tracking. Prevents "In-place modification" errors. |
- | `.float()` | `x = x.float()` | Converts to float (required for gradients/loss calc). |
- | `.requires_grad_()` | `x.requires_grad_(True)` | Starts tracking operations on this tensor for `.backward()`. |
- | `.squeeze()` | `model(x.squeeze())` | Removes dimensions of size 1 (e.g., `[1, 112, 112]` -> `[112, 112]`). |
- | `.view(-1)` | `flat = x.view(-1)` | Flattens the tensor into a 1D array (useful for `.argsort()`). |
- | `.argsort()` | `idx = grad.argsort()` | Returns the indices that would sort the tensor (finds "highest impact" pixels). |
- | `.clamp(0, 255)` | `img.clamp(0, 255)` | Ensures values stay within valid image range (0-255). |
- | `.round()` | `img.round()` | Rounds to nearest integer (important before `toInt` or submission). |
- | `.item()` | `val = loss.item()` | Extracts a single Python number from a 1x1 tensor. |
- 
- ---
- 
- ## 🛠️ Debugging Checklist for the Competition
+
+| Function              | Usage                      | Why use it?                                                                     |
+| :-------------------- | :------------------------- | :------------------------------------------------------------------------------ |
+| `.clone()`          | `new = x.clone()`        | Creates a deep copy. Changes to `new` won't affect `x`.                     |
+| `.detach()`         | `x_clean = x.detach()`   | Stops gradient tracking. Prevents "In-place modification" errors.               |
+| `.float()`          | `x = x.float()`          | Converts to float (required for gradients/loss calc).                           |
+| `.requires_grad_()` | `x.requires_grad_(True)` | Starts tracking operations on this tensor for `.backward()`.                  |
+| `.squeeze()`        | `model(x.squeeze())`     | Removes dimensions of size 1 (e.g.,`[1, 112, 112]` -> `[112, 112]`).        |
+| `.view(-1)`         | `flat = x.view(-1)`      | Flattens the tensor into a 1D array (useful for `.argsort()`).                |
+| `.argsort()`        | `idx = grad.argsort()`   | Returns the indices that would sort the tensor (finds "highest impact" pixels). |
+| `.clamp(0, 255)`    | `img.clamp(0, 255)`      | Ensures values stay within valid image range (0-255).                           |
+| `.round()`          | `img.round()`            | Rounds to nearest integer (important before `toInt` or submission).           |
+| `.item()`           | `val = loss.item()`      | Extracts a single Python number from a 1x1 tensor.                              |
+
+---
+
+## 🛠️ Debugging Checklist for the Competition
 
 - [ ] **Loss isn't decreasing?** Check your Learning Rate. It might be too high (exploding) or too low (frozen). Try $1e-3$ or $1e-4$.
 - [ ] **Shape Mismatch Error?** Print `.shape` on your inputs right before the forward pass.

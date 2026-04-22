@@ -9,7 +9,6 @@ challenges/deepfakes.zip
 challenges/test.zip
 challenges/answers.json
 
-
 # Data
 data/
 challenges/data/
@@ -27,3 +26,12 @@ __pycache__/
 # Logs/Artifacts
 wandb/
 runs/
+graphify-out/
+pdtn2025/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data and Models
+*.onnx
+*.csv.gz
