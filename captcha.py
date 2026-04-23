@@ -68,7 +68,7 @@ os.makedirs(cookies_dir, exist_ok=True)
 
 # Move the uploaded cookies.txt to the gdown cache directory
 # Assuming you uploaded cookies.txt to the root of the Colab session storage
-!mv /content/cookies.txt ~/.cache/gdown/cookies.txt
+# !mv /content/cookies.txt ~/.cache/gdown/cookies.txt
 
 print(f"cookies.txt moved to {os.path.join(cookies_dir, 'cookies.txt')}")
 

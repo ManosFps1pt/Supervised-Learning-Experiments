@@ -22,6 +22,7 @@ __pycache__/
 # IDE
 .idea/
 .vscode/
+.obsidian/
 
 # Logs/Artifacts
 wandb/
@@ -35,3 +36,11 @@ pdtn2025/
 # Data and Models
 *.onnx
 *.csv.gz
+
+# Generated challenge assets
+/private-clean.png
+/private-noisy.png
+/public-clean.png
+/public-clean.txt
+/public-noisy.png
+/public-noisy.txt

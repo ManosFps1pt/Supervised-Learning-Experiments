@@ -1,4 +1,4 @@
-# DTN Phase B Offline Notes
+# PDTN Phase B Offline Notes
 
 This file is meant to be useful during the contest, not descriptive about the contest.
 
@@ -146,6 +146,253 @@ from sklearn.metrics import (
     classification_report,
 )
 ```
+
+### 3.6 NumPy quick reference
+
+I checked the available NumPy material in:
+- `Numpy Tutorial/numpy_tutorial.ipynb`
+
+I also checked `resourses/`, but that folder currently contains:
+- `resourses/notes_chapter_Convolutional_Neural_Networks.pdf`
+
+So for NumPy, the useful local source is the tutorial notebook.
+
+#### Array creation and dtype
+
+```python
+import numpy as np
+
+# Create a 1D array from a Python list.
+x = np.array([1, 2, 3, 4], dtype=np.float32)
+
+# Range creation: start, stop, step.
+a = np.arange(0, 10, 2)
+
+# Evenly spaced points between two values.
+b = np.linspace(0.0, 1.0, 5)
+
+# All zeros, ones, constant-filled arrays.
+z = np.zeros((3, 4))
+o = np.ones((2, 2))
+f = np.full((2, 3), 7.0)
+
+# Identity matrix.
+I = np.eye(4)
+
+print(x.dtype)
+print(a)
+print(b)
+```
+
+#### Shape, dimensions, reshape, transpose
+
+```python
+# 2D matrix with 3 rows and 4 columns.
+X = np.arange(12).reshape(3, 4)
+
+# Basic array information.
+print(X.shape)   # (3, 4)
+print(X.ndim)    # number of dimensions
+print(X.size)    # total number of elements
+
+# Flatten to 1D.
+flat = X.reshape(-1)
+
+# Transpose rows <-> columns.
+XT = X.T
+
+# Add a new axis: useful for broadcasting.
+col = np.arange(3).reshape(-1, 1)
+row = np.arange(4).reshape(1, -1)
+```
+
+#### Indexing, slicing, masking
+
+```python
+X = np.arange(20).reshape(4, 5)
+
+# Single element.
+print(X[2, 3])
+
+# Row slice.
+print(X[1:3])
+
+# Column slice.
+print(X[:, 2])
+
+# Submatrix.
+print(X[1:3, 2:5])
+
+# Boolean mask.
+mask = X % 2 == 0
+evens = X[mask]
+
+# Find coordinates where condition holds.
+coords = np.argwhere(X > 10)
+
+# Conditional replacement.
+Y = np.where(X > 10, 1, 0)
+```
+
+#### Concatenate, split, stack
+
+```python
+a = np.array([1, 2, 3])
+b = np.array([4, 5, 6])
+
+# End-to-end concatenation.
+ab = np.concatenate([a, b])
+
+# Horizontal / vertical stack for matrices.
+A = np.ones((2, 3))
+B = np.zeros((2, 3))
+
+H = np.hstack([A, B])   # shape (2, 6)
+V = np.vstack([A, B])   # shape (4, 3)
+C = np.column_stack([a, b])  # columns from 1D arrays
+
+# Split arrays into pieces.
+parts = np.array_split(np.arange(10), 3)
+```
+
+#### Arithmetic, broadcasting, clipping
+
+```python
+x = np.array([1, 2, 3], dtype=np.float32)
+y = np.array([10, 20, 30], dtype=np.float32)
+
+# Elementwise arithmetic.
+print(x + y)
+print(x * y)
+print(x / y)
+
+# Scalar broadcasting.
+print(x + 5)
+
+# Broadcast row + column to a matrix.
+row = np.arange(4).reshape(1, 4)
+col = np.arange(3).reshape(3, 1)
+grid = row + col
+
+# Clamp values into a safe range.
+safe = np.clip(grid, 0, 4)
+```
+
+#### Statistics you will actually use
+
+```python
+X = np.arange(12).reshape(3, 4).astype(np.float32)
+
+# Global statistics.
+print(np.mean(X))
+print(np.std(X))
+print(np.var(X))
+print(np.min(X))
+print(np.max(X))
+print(np.sum(X))
+
+# Per-axis statistics.
+print(np.mean(X, axis=0))   # column means
+print(np.mean(X, axis=1))   # row means
+
+# Robust statistics.
+print(np.median(X))
+print(np.quantile(X, 0.25))
+print(np.percentile(X, 90))
+```
+
+#### Sorting and ranking
+
+```python
+x = np.array([5, 1, 9, 3])
+
+# Sorted values.
+print(np.sort(x))
+
+# Index of max / min.
+print(np.argmax(x))
+print(np.argmin(x))
+
+# Ranking from largest to smallest.
+order = np.argsort(-x)
+print(order)
+
+# Search insertion position in sorted array.
+sorted_x = np.sort(x)
+pos = np.searchsorted(sorted_x, 4)
+print(pos)
+```
+
+#### NaN / inf safety
+
+```python
+x = np.array([1.0, np.nan, np.inf, 4.0])
+
+# Detect invalid values before model training.
+print(np.isnan(x))
+print(np.isinf(x))
+print(np.any(np.isnan(x)))
+print(np.all(np.isfinite(x)) if hasattr(np, 'isfinite') else 'use isnan/isinf')
+```
+
+#### Linear algebra
+
+```python
+A = np.array([[1.0, 2.0], [3.0, 4.0]])
+B = np.array([[5.0], [6.0]])
+
+# Matrix multiplication.
+print(A @ B)
+print(np.dot(A, B))
+
+# Useful norms.
+print(np.linalg.norm(A))
+print(np.linalg.norm(A, axis=1))  # row norms
+
+# Solve / inspect.
+print(np.linalg.det(A))
+print(np.linalg.inv(A))
+```
+
+#### Trig / exp / log
+
+```python
+x = np.linspace(0, np.pi, 5)
+
+print(np.sin(x))
+print(np.cos(x))
+print(np.exp(x))
+print(np.log(np.array([1.0, 2.0, 4.0])))
+print(np.sqrt(np.array([1.0, 4.0, 9.0])))
+```
+
+#### NumPy functions that appeared in the local tutorial
+
+High-yield ones from `Numpy Tutorial/numpy_tutorial.ipynb`:
+- `np.array`
+- `np.arange`
+- `np.linspace`
+- `np.zeros`, `np.ones`, `np.full`, `np.eye`
+- `np.reshape`
+- `np.concatenate`, `np.hstack`, `np.vstack`, `np.column_stack`, `np.split`, `np.array_split`
+- `np.where`, `np.argwhere`
+- `np.sort`, `np.argsort`, `np.argmax`, `np.argmin`, `np.searchsorted`
+- `np.mean`, `np.median`, `np.std`, `np.var`, `np.min`, `np.max`, `np.sum`
+- `np.quantile`, `np.percentile`
+- `np.isnan`, `np.isinf`, `np.any`, `np.all`
+- `np.dot`
+- `np.linalg.norm`, `np.linalg.inv`, `np.linalg.det`
+- `np.sin`, `np.cos`, `np.exp`, `np.log`, `np.sqrt`
+- `np.clip`, `np.unique`
+
+#### NumPy contest advice
+
+- if shapes are confusing, print `.shape` after every transformation
+- prefer vectorized operations over Python loops
+- remember `axis=0` usually means "down the rows / per column"
+- remember `axis=1` usually means "across columns / per row"
+- use boolean masks instead of slow manual loops
+- use `astype(np.float32)` before sending arrays to PyTorch
 
 ## 4. Classical Machine Learning
 
@@ -1028,11 +1275,267 @@ print(df.head())
 print(np.unique(y, return_counts=True))
 ```
 
-## 11. Highest-Value Local Repo Files
+## 11. Worked Problems From This Repo
+
+These are not just references. They are solved patterns you can reuse.
+
+### 11.1 `emotions.ipynb`: sparse adversarial attack on emotion classifier
+
+Problem pattern:
+- input is a grayscale `112 x 112` face image
+- model is fixed
+- goal is to change the predicted emotion with very small `L1` pixel edits
+
+What the notebook does:
+- loads a pretrained grayscale-adapted `ShuffleNet`
+- wraps preprocessing inside the model
+- uses gradients with respect to the image
+- changes only the highest-impact pixels
+- moves each chosen pixel by only `+1` or `-1`
+- clamps pixels into `[0, 255]`
+
+Key idea:
+- do **not** optimize all pixels with large continuous changes
+- instead, rank pixels by `abs(gradient)` and edit only a few each step
+
+Important pattern:
+
+```python
+# Gradient-based sparse pixel attack:
+# 1. compute loss toward target class
+# 2. backprop into the image
+# 3. sort pixels by gradient magnitude
+# 4. change only the top few pixels by +/-1
+
+output = model(adv.clamp(0, 255))
+loss = F.cross_entropy(output, torch.tensor([target_class]))
+model.zero_grad()
+loss.backward()
+
+grad = adv.grad.detach()
+indices = torch.argsort(grad.view(-1).abs(), descending=True)
+```
+
+What to remember:
+- `targeted` attack: push image toward a chosen target class
+- `untargeted` attack: push image away from the original class
+- use `.clone().detach()` often to avoid autograd mistakes
+- compare images after `.round()` because submission is integer-valued
+
+### 11.2 `challenges/nextmovie.ipynb`: ranking by optimized query embedding
+
+Problem pattern:
+- you are given movie embeddings
+- you must produce one query vector so that movies rank in a required order
+
+Cheap solution:
+- build the query as a weighted sum of the target embeddings
+- subtract the mean embedding of non-target movies
+- normalize the final query
+
+```python
+# Target movie embeddings.
+T = E[targets]
+
+# Non-target embeddings.
+others = E[[i for i in range(len(E)) if i not in targets]]
+
+# Larger weights for earlier desired ranks.
+weights = torch.tensor([32., 16., 8., 4., 2.])
+
+# Pull target movies closer.
+emb = (weights[:, None] * T).sum(dim=0)
+
+# Push the rest away.
+emb = emb - 4 * others.mean(dim=0)
+
+# Normalize for cosine similarity.
+emb = emb / emb.norm()
+```
+
+Better solution from the notebook:
+- optimize the query vector directly with `Adam`
+- define loss terms that force:
+  - `target1 > target2 > ... > target5`
+  - all targets > all non-targets
+- use cosine similarity and exponential hinge-like penalties
+
+What to remember:
+- ranking tasks on embeddings often reduce to **query vector design**
+- normalization is critical
+- weighted sums are a strong baseline
+- direct optimization over the query is often enough; you do not need to retrain a model
+
+### 11.3 `challenges/captcha.ipynb`: solve arithmetic CAPTCHA by segmenting and classifying digits
+
+Problem pattern:
+- one image contains `digit digit operator digit digit`
+- output is the computed arithmetic result
+
+The notebook solution:
+- train MNIST digit classifiers first
+- train one classifier on clean MNIST
+- train another classifier on noisy/augmented MNIST
+- split the CAPTCHA image into 5 fixed `28x28` slices
+- classify each digit slice independently
+- detect operator with a cheap heuristic instead of training another model
+
+Digit model used:
+
+```python
+class ConvNet(nn.Module):
+    def __init__(self):
+        super(ConvNet, self).__init__()
+        self.conv1 = nn.Conv2d(1, 10, kernel_size=5)
+        self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
+        self.fc1 = nn.Linear(320, 50)
+        self.fc2 = nn.Linear(50, 10)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.relu(x)
+        x = F.max_pool2d(x, 2)
+        x = self.conv2(x)
+        x = self.relu(x)
+        x = F.max_pool2d(x, 2)
+        x = x.view(-1, 320)
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
+```
+
+Image splitting pattern:
+
+```python
+# Full CAPTCHA has shape roughly (1, 28, 140).
+# Split across width into 5 pieces of width 28.
+digit1 = eq[:, :, :, 0:28]
+digit2 = eq[:, :, :, 28:56]
+op     = eq[:, :, :, 56:84]
+digit3 = eq[:, :, :, 84:112]
+digit4 = eq[:, :, :, 112:140]
+```
+
+Operator trick:
+- `+` has a vertical stroke
+- `-` mostly does not
+- the notebook uses pixel sums in a central vertical strip to distinguish them
+
+Noise trick:
+- for noisy CAPTCHAs, it applies largest-connected-component extraction
+- this removes isolated noise while keeping the main digit structure
+
+What to remember:
+- if positions are fixed, segmentation can be a simple slice, not a detector
+- if only one symbol differs structurally, a heuristic may beat training another model
+- train on noisy augmentations if the test data is noisy
+
+### 11.4 `pdtn2025/deepfakes_final.ipynb`: binary image classification with a required backbone
+
+Problem pattern:
+- image classification
+- architecture may be constrained
+- dataset is split into train / validation folders
+
+What the notebook does:
+- uses `ImageFolder`-style dataset setup
+- normalizes images with ImageNet statistics
+- uses `torchvision.models.shufflenet_v2_x1_0`
+- swaps the last classifier layer to `2` outputs
+- optionally loads ImageNet pretrained weights
+- trains with `Adam`, low learning rate, and validation tracking
+
+Important pattern:
+
+```python
+model = models.shufflenet_v2_x1_0(
+    weights=models.ShuffleNet_V2_X1_0_Weights.IMAGENET1K_V1
+)
+model.fc = torch.nn.Linear(model.fc.in_features, 2)
+
+optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
+```
+
+What to remember:
+- when the architecture is fixed, the main gains come from:
+  - pretrained initialization
+  - correct transforms
+  - optimizer / LR choice
+  - enough validation monitoring
+
+### 11.5 `pdtn2025/Αντίγραφο_embeddings_greedy_torch (1).ipynb`: word-chain search on embeddings
+
+Problem pattern:
+- words are nodes
+- cosine similarity defines closeness
+- you need a chain from one word to another
+
+What the notebook does:
+- reads embeddings
+- L2-normalizes them
+- computes pairwise similarities with matrix multiplication
+- converts similarity to a discrete distance score
+- tests greedy strategies
+
+Important pattern:
+
+```python
+# Similarity to all words at once.
+sim_full = torch.matmul(embeddings_tensor, torch.t(embeddings_tensor))
+
+# Greedy next-step candidates.
+greedy_best = torch.topk(sim_full, k=32057, axis=1)
+```
+
+What to remember:
+- if all vectors are normalized, dot product = cosine similarity
+- matrix multiplication gives all-vs-all similarity fast
+- greedy is a useful baseline but may fail globally
+- when a path problem appears on embeddings, think:
+  - greedy
+  - beam search
+  - shortest path on a graph induced by similarity
+
+### 11.6 `pdtn2025/Αντίγραφο_knit.ipynb`: optimize line weights to reconstruct an image
+
+Problem pattern:
+- output is not labels but parameters of a generative construction
+- here the construction is a set of weighted lines
+- loss is simply image reconstruction error
+
+What the notebook does:
+- defines a differentiable `linesToImage(lines)`
+- initializes line weights as zeros
+- optimizes those weights directly with SGD
+- minimizes mean squared error to the target image
+- exports the final weights after scaling/clamping
+
+Important pattern:
+
+```python
+lines = torch.zeros((N//2, N), requires_grad=True)
+optimizer = optim.SGD([lines], lr=0.5)
+
+for step in range(num_steps):
+    generated_image = linesToImage(lines)
+    loss = torch.mean((generated_image - target) ** 2)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+```
+
+What to remember:
+- sometimes the variable you optimize is **not model weights**, but the answer itself
+- if the rendering process is differentiable, you can optimize the answer directly
+- this is a strong pattern for inverse problems and reconstruction tasks
+
+## 12. Highest-Value Local Repo Files
 
 Review these before the contest:
 
-- `challenges/comp/train_func.py`
+- `comp/train_func.py`
 - `train_function.py`
 - `challenges/mnist1.py`
 - `challenges/cfar1.py`
@@ -1040,10 +1543,16 @@ Review these before the contest:
 - `challenges/nlp.py`
 - `challenges/extracted.py`
 - `decision_trees.py`
-- `challenges/comp/training_bug.md`
-- `challenges/comp/tutor_advice_classification_vs_regression.md`
+- `comp/training_bug.md`
+- `comp/tutor_advice_classification_vs_regression.md`
+- `emotions.ipynb`
+- `challenges/nextmovie.ipynb`
+- `challenges/captcha.ipynb`
+- `pdtn2025/deepfakes_final.ipynb`
+- `pdtn2025/Αντίγραφο_embeddings_greedy_torch (1).ipynb`
+- `pdtn2025/Αντίγραφο_knit.ipynb`
 
-## 12. Final Reminder
+## 13. Final Reminder
 
 The usual winning pattern is:
 
