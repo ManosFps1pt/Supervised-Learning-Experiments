@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDTN Phase B Notes Study Plan</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  :root { --fg:#111; --muted:#555; --rule:#d9d9d9; --code-bg:#f5f5f5; }
+  html { font-size: 15px; }
+  body { font-family: Georgia, 'Times New Roman', serif; color: var(--fg); line-height: 1.45; max-width: 820px; margin: 0 auto; padding: 0; }
+  h1, h2, h3 { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.2; }
+  h1 { font-size: 26px; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 2px solid var(--rule); }
+  h2 { font-size: 20px; margin: 24px 0 10px; }
+  h3 { font-size: 16px; margin: 18px 0 8px; }
+  p { margin: 8px 0; }
+  ul, ol { margin: 8px 0 10px 22px; }
+  li { margin: 3px 0; }
+  code { font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.92em; background: var(--code-bg); padding: 0.1em 0.3em; border-radius: 4px; }
+  pre { background: var(--code-bg); padding: 10px 12px; border-radius: 6px; overflow-wrap: anywhere; white-space: pre-wrap; }
+  pre code { background: transparent; padding: 0; }
+  strong { font-weight: 700; }
+  blockquote { margin: 12px 0; padding-left: 12px; border-left: 3px solid var(--rule); color: var(--muted); }
+</style>
+</head>
+<body>
+<h1>PDTN Phase B Notes Study Plan</h1>
+<p>This file is not for learning new material.</p>
+<p>It is for learning how to use the notes fast under pressure.</p>
+<p>The goal for the last 2 evenings is:</p>
+<ul>
+<li>stop searching randomly</li>
+<li>know where each kind of problem lives in the notes</li>
+<li>find the right snippet quickly</li>
+<li>apply a baseline or fix without hesitation</li>
+</ul>
+<h2>1. Main Principle</h2>
+<p>Treat the notes like a tool, not a textbook.</p>
+<p>Your goal is not:</p>
+<ul>
+<li>read everything again</li>
+<li>memorize every code block</li>
+<li>improve the notes again</li>
+</ul>
+<p>Your goal is:</p>
+<ul>
+<li>memorize the map</li>
+<li>practice retrieval</li>
+<li>build pressure habits</li>
+</ul>
+<h2>2. The Map You Should Know By Memory</h2>
+<p>Memorize these sections first:</p>
+<ul>
+<li><code>2</code>: first baseline by problem type</li>
+<li><code>4</code>: sklearn / tabular fixes</li>
+<li><code>6</code>: PyTorch errors, dtype, device, shapes, loss issues</li>
+<li><code>7</code>: vision, transforms, channels, CNN reminders</li>
+<li><code>8</code>: text, embeddings, TF-IDF, cosine similarity</li>
+<li><code>9</code>: optimization / solver problems</li>
+<li><code>10</code>: debugging checklist</li>
+<li><code>11</code>: worked problems from this repo</li>
+</ul>
+<p>If you know this map, you will already save time.</p>
+<h2>3. Fast Trigger -&gt; Section Lookup</h2>
+<p>Use these trigger words during competition:</p>
+<ul>
+<li><code>baseline</code> -&gt; Section <code>2</code></li>
+<li><code>tabular / sklearn / NaN / encoding</code> -&gt; Section <code>4</code></li>
+<li><code>dtype / device / shape / loss / DataLoader / batch</code> -&gt; Section <code>6</code></li>
+<li><code>images / transforms / channels / pretrained backbone</code> -&gt; Section <code>7</code></li>
+<li><code>TF-IDF / retrieval / cosine / embeddings / token ids</code> -&gt; Section <code>8</code></li>
+<li><code>constraints / assignment / scheduling / discrete optimization</code> -&gt; Section <code>9</code></li>
+<li><code>I do not know what is broken</code> -&gt; Section <code>10</code></li>
+<li><code>this looks like an old solved repo problem</code> -&gt; Section <code>11</code></li>
+</ul>
+<h2>4. Competition Habit</h2>
+<p>When blocked, do this in order:</p>
+<ol>
+<li>identify the task type</li>
+<li>jump to the matching baseline section</li>
+<li>implement the cheapest correct baseline</li>
+<li>validate locally</li>
+<li>if broken, jump to the matching error/debug section</li>
+<li>only improve after a correct baseline exists</li>
+</ol>
+<p>If you are stuck for more than 2 minutes:</p>
+<ol>
+<li>classify the problem</li>
+<li>open the matching section</li>
+<li>copy the baseline pattern</li>
+<li>use the debugging checklist</li>
+</ol>
+<h2>5. What To Practice</h2>
+<p>Do not just reread.</p>
+<p>Practice lookup.</p>
+<p>Use prompts like:</p>
+<ul>
+<li>tabular classification baseline?</li>
+<li>regression loss and target dtype?</li>
+<li>CrossEntropy target dtype?</li>
+<li>stack vs cat?</li>
+<li>binary classification loss?</li>
+<li>embedding retrieval normalization?</li>
+<li>DataLoader worker crash?</li>
+<li>submission sanity check?</li>
+<li>grayscale image into RGB backbone?</li>
+<li>coordinate-to-RGB regression like squarepainting?</li>
+</ul>
+<p>For each prompt:</p>
+<ul>
+<li>start from the top of the notes</li>
+<li>find the correct section fast</li>
+<li>find the exact snippet or rule</li>
+<li>explain in one sentence why that section is the right one</li>
+</ul>
+<h2>6. Two-Evening Plan</h2>
+<h3>Evening 1</h3>
+<p>Goal:</p>
+<ul>
+<li>memorize the structure of the notes</li>
+</ul>
+<p>Steps:</p>
+<ol>
+<li>skim the notes once for section structure only</li>
+<li>write the section map from memory</li>
+<li>review the section map until you can reproduce it</li>
+<li>do 5 timed retrieval drills</li>
+</ol>
+<p>Timed retrieval drill format:</p>
+<ul>
+<li>one prompt</li>
+<li>30 to 60 seconds</li>
+<li>locate the correct section</li>
+<li>locate the relevant snippet</li>
+<li>say out loud what it is for</li>
+</ul>
+<h3>Evening 2</h3>
+<p>Goal:</p>
+<ul>
+<li>simulate contest retrieval under pressure</li>
+</ul>
+<p>Use 3 to 5 mini-scenarios such as:</p>
+<ul>
+<li>image classifier not learning</li>
+<li>classification labels wrong dtype</li>
+<li>text task with no pretrained weights</li>
+<li>squarepainting-style RGB regression</li>
+<li>solver problem vs ML problem</li>
+</ul>
+<p>For each scenario:</p>
+<ul>
+<li>start a timer</li>
+<li>use only the notes</li>
+<li>find the matching sections</li>
+<li>write or describe the first baseline or fix</li>
+<li>stop after 10 to 15 minutes</li>
+</ul>
+<p>You are training navigation speed, not perfect solutions.</p>
+<h2>7. Five Emergency Queries To Memorize</h2>
+<p>These should become automatic:</p>
+<ul>
+<li>wrong task / wrong loss pairing</li>
+<li>shape mismatch</li>
+<li>device mismatch</li>
+<li>NaN / OOM</li>
+<li>submission / export mistake</li>
+</ul>
+<p>If one of these appears, you should already know where to go.</p>
+<h2>8. What Not To Do</h2>
+<ul>
+<li>do not passively reread the full notes again and again</li>
+<li>do not try to memorize every code block</li>
+<li>do not spend the last 2 evenings expanding the notes</li>
+<li>do not practice only when calm; use a timer</li>
+<li>do not let yourself browse aimlessly through sections</li>
+</ul>
+<h2>9. Best Mental Model</h2>
+<p>The notes are a decision system:</p>
+<ul>
+<li>identify task</li>
+<li>find baseline</li>
+<li>find error section if needed</li>
+<li>find similar worked problem if needed</li>
+<li>submit a correct version early</li>
+</ul>
+<p>That is better than having bigger notes but no retrieval speed.</p>
+<h2>10. Five-Minute Pre-Competition Review</h2>
+<p>Right before the competition, review only this:</p>
+<ul>
+<li>the section map</li>
+<li>the trigger -&gt; section mapping</li>
+<li>the 2-minute stuck rule</li>
+<li>the 5 emergency queries</li>
+<li>the baseline-first principle</li>
+</ul>
+<p>Do not start deep studying at the last minute.</p>
+<h2>11. One-Line Rule</h2>
+<p>If I am stuck, I do not search randomly.</p>
+<p>I classify the problem, jump to the matching section, use the cheapest correct baseline, and debug with the checklist.</p>
+</body>
+</html>

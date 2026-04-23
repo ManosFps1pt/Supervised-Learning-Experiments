@@ -150,9 +150,11 @@ from sklearn.metrics import (
 ### 3.6 NumPy quick reference
 
 I checked the available NumPy material in:
+
 - `Numpy Tutorial/numpy_tutorial.ipynb`
 
 I also checked `resourses/`, but that folder currently contains:
+
 - `resourses/notes_chapter_Convolutional_Neural_Networks.pdf`
 
 So for NumPy, the useful local source is the tutorial notebook.
@@ -369,6 +371,7 @@ print(np.sqrt(np.array([1.0, 4.0, 9.0])))
 #### NumPy functions that appeared in the local tutorial
 
 High-yield ones from `Numpy Tutorial/numpy_tutorial.ipynb`:
+
 - `np.array`
 - `np.arange`
 - `np.linspace`
@@ -561,6 +564,136 @@ clf = SVC(
 # SVM needs scaled features.
 clf.fit(Xtr_num, y_train)
 pred = clf.predict(Xva_num)
+```
+
+### 4.7 Common pandas / sklearn errors and fast fixes
+
+#### `ValueError: could not convert string to float`
+
+Meaning:
+
+- a numeric model received raw text or categorical columns
+
+Fast check:
+
+```python
+print(X_train.select_dtypes(exclude=["number"]).columns.tolist())
+```
+
+Fix:
+
+```python
+# Keep only numeric columns, or encode categoricals explicitly.
+X_train_oh = pd.get_dummies(X_train, dtype=float)
+X_val_oh = pd.get_dummies(X_val, dtype=float)
+
+# Validation must have the exact same columns as training.
+X_val_oh = X_val_oh.reindex(columns=X_train_oh.columns, fill_value=0)
+```
+
+#### `Input X contains NaN`
+
+Meaning:
+
+- the estimator does not accept missing values directly
+
+Fix:
+
+```python
+# Median for numeric columns is the safest cheap default.
+for c in X_train.select_dtypes(include=["number"]).columns:
+    med = X_train[c].median()
+    X_train[c] = X_train[c].fillna(med)
+    X_val[c] = X_val[c].fillna(med)
+```
+
+Rule:
+
+- fit missing-value handling on train only
+- apply the same fill values to validation and test
+
+#### `Found input variables with inconsistent numbers of samples`
+
+Meaning:
+
+- `X` and `y` no longer have the same number of rows
+- common cause: filtering rows in `X` but not in `y`
+
+Fix:
+
+```python
+print(len(X), len(y))
+
+# Build one mask, then apply it to both X and y.
+mask = X.notna().all(axis=1)
+X = X.loc[mask].reset_index(drop=True)
+y = y.loc[mask].reset_index(drop=True)
+```
+
+#### `The feature names should match those that were passed during fit`
+
+Meaning:
+
+- train and validation columns differ
+- common after one-hot encoding or manual column selection
+
+Fix:
+
+```python
+# Force the exact training column order before predict().
+X_val_oh = X_val_oh.reindex(columns=X_train_oh.columns, fill_value=0)
+pred = clf.predict(X_val_oh)
+```
+
+#### `X has n features, but model expects m features`
+
+Meaning:
+
+- you trained on one feature matrix and predicted on another one with a different width
+
+Fast check:
+
+```python
+print(X_train_oh.shape)
+print(X_val_oh.shape)
+```
+
+Most common fixes:
+
+- reindex validation columns to training columns
+- do not fit PCA / scaler / vectorizer separately on validation
+- do not drop columns on only one split
+
+#### `Unknown label type: continuous`
+
+Meaning:
+
+- you used a classifier for a regression target
+
+Fix:
+
+- if the target is a real number, use regressor classes like `Ridge`, `RandomForestRegressor`, `XGBRegressor`
+- if it is classification, make sure labels are true class ids, not floats like `0.0, 1.0, 2.0`
+
+#### `This solver needs samples of at least 2 classes`
+
+Meaning:
+
+- one split contains only one class
+- common on tiny datasets or non-stratified splits
+
+Fix:
+
+```python
+print(y_train.value_counts())
+
+X_train, X_val, y_train, y_val = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
 ```
 
 ## 5. PyTorch Simple Models
@@ -889,6 +1022,505 @@ for xb, yb in train_loader:
     yb = yb.to(device, non_blocking=True)
 ```
 
+### 6.5 Common PyTorch code errors and how to fix them
+
+#### `Expected all tensors to be on the same device`
+
+Meaning:
+
+- your model is on GPU but a batch is on CPU, or the opposite
+
+Fix:
+
+```python
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model = model.to(device)
+
+for xb, yb in train_loader:
+    xb = xb.to(device, non_blocking=True)
+    yb = yb.to(device, non_blocking=True)
+```
+
+Also remember:
+
+- if you create tensors manually inside training, put them on `device`
+- a common mistake is `torch.tensor([target_class])` without `.to(device)`
+
+```python
+target = torch.tensor([target_class], device=device)
+```
+
+#### `Expected scalar type Long but found Float`
+
+Meaning:
+
+- you are using `CrossEntropyLoss`, but labels are floats
+
+Fix:
+
+```python
+ytr = torch.tensor(y_train_np, dtype=torch.long)
+criterion = nn.CrossEntropyLoss()
+```
+
+Rule:
+
+- `CrossEntropyLoss` -> labels must be integer class ids (`long`)
+- `MSELoss` / `L1Loss` -> targets must usually be `float32`
+
+#### `Expected input batch_size to match target batch_size`
+
+Meaning:
+
+- output shape and target shape do not line up
+
+Fix:
+
+```python
+print("pred shape:", pred.shape)
+print("target shape:", yb.shape)
+```
+
+Typical expected shapes:
+
+- classification:
+  - `pred`: `(batch_size, num_classes)`
+  - `yb`: `(batch_size,)`
+- regression:
+  - `pred`: `(batch_size, 1)` or `(batch_size,)`
+  - `yb`: `(batch_size,)`
+
+```python
+pred = model(xb)
+pred = pred.squeeze(-1)   # only for regression if shape is (N, 1)
+loss = criterion(pred, yb)
+```
+
+#### `mat1 and mat2 shapes cannot be multiplied`
+
+Meaning:
+
+- your `Linear` layer input size is wrong
+
+Fix:
+
+```python
+print(x.shape)
+```
+
+Most common conv-net fix:
+
+```python
+x = x.view(x.size(0), -1)
+```
+
+Best habit:
+
+- print tensor shapes inside `forward()` while debugging
+- verify that `nn.Linear(in_features=...)` matches the flattened tensor
+
+#### `RuntimeError: stack expects each tensor to be equal size`
+
+Example:
+
+```python
+RuntimeError: stack expects each tensor to be equal size,
+but got [10000, 3] at entry 0 and [10000, 2] at entry 1
+```
+
+Meaning:
+
+- you used `torch.stack(...)` on tensors with different shapes
+- `stack` adds a new dimension, so every input tensor must already have the exact same shape
+
+Why this happens:
+
+- two feature blocks have different numbers of columns
+- predictions from different models have different class counts
+- one tensor is missing a column / channel / time step
+- variable-length sequences were not padded first
+
+Wrong:
+
+```python
+a = torch.randn(10000, 3)
+b = torch.randn(10000, 2)
+x = torch.stack([a, b])   # crash
+```
+
+Fix 1: if you wanted to combine features side-by-side, use `torch.cat(..., dim=1)`
+
+```python
+a = torch.randn(10000, 3)
+b = torch.randn(10000, 2)
+
+# Result shape: (10000, 5)
+x = torch.cat([a, b], dim=1)
+```
+
+Fix 2: if you really need `stack`, first make shapes equal
+
+```python
+a = torch.randn(10000, 3)
+b = torch.randn(10000, 3)
+
+# Result shape: (2, 10000, 3)
+x = torch.stack([a, b], dim=0)
+```
+
+Fix 3: print shapes before stacking
+
+```python
+print(a.shape)
+print(b.shape)
+```
+
+Rule:
+
+- `torch.stack([a, b])` requires `a.shape == b.shape`
+- `torch.cat([a, b], dim=k)` requires same shape on all dimensions except `dim=k`
+
+Common contest cases:
+
+- combining embeddings from different sources
+- combining logits from models with different class counts
+- collecting variable-length sequences without padding
+- stacking image tensors that were resized differently
+
+Square-painting generalization:
+
+- this also happens when one tensor is the **input** and the other is the **target**
+- for example, coordinates may have shape `(N, 2)` while RGB targets have shape `(N, 3)`
+- those are different roles, not two copies of the same kind of tensor
+
+Wrong pattern:
+
+```python
+# inputs: x,y coordinates
+inputs.shape == (N, 2)
+
+# targets: r,g,b values
+targets.shape == (N, 3)
+
+bad = torch.stack([inputs, targets])   # wrong
+```
+
+Why it is wrong:
+
+- `stack` means "same tensor shape, add a new axis"
+- but `(N, 2)` and `(N, 3)` are not the same shape
+- semantically they should stay separate as `(x, y)` in supervised learning
+
+Correct supervised-learning pattern:
+
+```python
+from torch.utils.data import TensorDataset, DataLoader
+
+# Keep inputs and targets separate.
+dataset = TensorDataset(inputs, targets)
+loader = DataLoader(dataset, batch_size=64, shuffle=True)
+
+for batch_x, batch_y in loader:
+    pred = model(batch_x)
+    loss = criterion(pred, batch_y)
+```
+
+If you really mean to build one combined feature matrix, use `cat`, not `stack`:
+
+```python
+# Only if combining into one feature table actually makes sense.
+xy_rgb = torch.cat([inputs, targets], dim=1)   # shape (N, 5)
+```
+
+Competition rule:
+
+- different roles -> keep separate
+- same role, different feature blocks -> usually `cat`
+- new axis over equal-shaped tensors -> `stack`
+
+#### `CUDA out of memory`
+
+Meaning:
+
+- your batch, model, or image size is too large for the GPU
+
+Fixes:
+
+- reduce `batch_size`
+- reduce input resolution
+- use a smaller model
+- avoid storing unnecessary tensors
+- use `torch.no_grad()` in validation
+
+```python
+batch_size = 32   # try 128 -> 64 -> 32 -> 16
+```
+
+#### Loss becomes `nan`
+
+Meaning:
+
+- unstable optimization, bad preprocessing, or invalid values
+
+Fixes:
+
+- lower learning rate
+- check for NaNs in inputs and labels
+- normalize inputs
+- clip gradients
+
+```python
+print(torch.isnan(xb).any())
+print(torch.isnan(yb).any())
+
+torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+```
+
+#### Accuracy stays near random chance
+
+Meaning:
+
+- the task/loss/labels are mismatched, or the model is not learning
+
+Fixes:
+
+- overfit 8 samples
+- verify class balance
+- verify optimizer order
+- verify you are not applying `softmax` before `CrossEntropyLoss`
+
+Wrong:
+
+```python
+probs = torch.softmax(model(xb), dim=1)
+loss = nn.CrossEntropyLoss()(probs, yb)
+```
+
+Correct:
+
+```python
+logits = model(xb)
+loss = nn.CrossEntropyLoss()(logits, yb)
+```
+
+#### Regression problem but classification code was reused
+
+Meaning:
+
+- you copied a classification loop into a regression task
+
+Fix:
+
+```python
+criterion = nn.MSELoss()
+ytr = torch.tensor(y_train_np, dtype=torch.float32)
+pred = model(xb).squeeze(-1)
+loss = criterion(pred, yb)
+```
+
+Rule:
+
+- regression = float targets + regression loss
+- classification = integer targets + classification loss
+
+#### `Trying to backward through the graph a second time`
+
+Meaning:
+
+- you reused a tensor with graph history from a previous step
+
+Fix:
+
+```python
+x = x.detach()
+```
+
+Common cases:
+
+- adversarial attacks
+- iterative input optimization
+- reusing model outputs later without detaching
+
+#### In-place operation error
+
+Meaning:
+
+- you modified a tensor that autograd still needed
+
+Fix:
+
+```python
+x_tmp = x.clone().detach()
+# modify x_tmp instead of x directly
+```
+
+Common cases:
+
+- manual image attacks
+- direct optimization on tensors
+- custom training logic with partial updates
+
+#### Validation behaves strangely because Dropout / BatchNorm are wrong
+
+Meaning:
+
+- you forgot to switch between training and evaluation modes
+
+Fix:
+
+```python
+model.train()   # training
+model.eval()    # validation / inference
+```
+
+Always combine evaluation with:
+
+```python
+with torch.no_grad():
+    ...
+```
+
+#### Best quick PyTorch debug print block
+
+```python
+print("xb:", xb.shape, xb.dtype, xb.device)
+print("yb:", yb.shape, yb.dtype, yb.device)
+pred = model(xb)
+print("pred:", pred.shape, pred.dtype, pred.device)
+print("pred sample:", pred[:2])
+print("target sample:", yb[:10])
+```
+
+### 6.6 More PyTorch errors you may hit
+
+#### `Target 7 is out of bounds`
+
+Meaning:
+
+- your labels contain a class id outside `[0, num_classes - 1]`
+- common when labels start at `1` instead of `0`
+
+Fix:
+
+```python
+print(ytr.min().item(), ytr.max().item())
+
+# Example: labels were 1..K, convert them to 0..K-1.
+ytr = ytr - 1
+yva = yva - 1
+
+# Final layer must output one logit per class.
+model.fc = nn.Linear(model.fc.in_features, num_classes)
+```
+
+#### `Using a target size ... different to the input size ...` with `BCEWithLogitsLoss`
+
+Meaning:
+
+- binary-classification logits and targets do not have matching shapes
+
+Correct pattern:
+
+```python
+# One logit per sample.
+logits = model(xb).squeeze(1)
+
+# BCE targets must be float 0/1, not long class ids.
+yb = yb.float()
+
+loss = nn.BCEWithLogitsLoss()(logits, yb)
+```
+
+Rule:
+
+- binary classification with one output neuron -> `BCEWithLogitsLoss`
+- multiclass classification with `C` outputs -> `CrossEntropyLoss`
+
+#### `view size is not compatible with input tensor's size and stride`
+
+Meaning:
+
+- you tried `.view(...)` on a non-contiguous tensor
+- common after `transpose`, `permute`, or slicing
+
+Fix:
+
+```python
+# reshape() is safer when tensor memory is not contiguous.
+x = x.reshape(x.size(0), -1)
+```
+
+Alternative:
+
+```python
+x = x.contiguous().view(x.size(0), -1)
+```
+
+#### `Can't call numpy() on Tensor that requires grad`
+
+Meaning:
+
+- you tried to convert a tensor to NumPy before detaching it from autograd
+
+Fix:
+
+```python
+arr = pred.detach().cpu().numpy()
+```
+
+Rule:
+
+- plotting / saving / scikit-learn use -> `tensor.detach().cpu().numpy()`
+
+#### `DataLoader worker (pid ...) exited unexpectedly`
+
+Meaning:
+
+- worker subprocesses crashed
+- on Windows this often comes from notebook multiprocessing issues
+
+Fast fix:
+
+```python
+# First make it work. Then increase workers again if needed.
+train_loader = DataLoader(train_ds, batch_size=128, shuffle=True, num_workers=0)
+```
+
+Then check:
+
+- dataset `__getitem__` does not crash
+- images/files actually exist
+- batch creation does not use unsupported objects
+- only raise `num_workers` after the single-process loader works
+
+#### `element 0 of tensors does not require grad and does not have a grad_fn`
+
+Meaning:
+
+- you broke the graph before `backward()`
+
+Common causes:
+
+- calling `.detach()` too early
+- converting to NumPy in the middle of training
+- wrapping a tensor with `torch.tensor(existing_tensor)` instead of using it directly
+
+Wrong:
+
+```python
+pred = model(xb).detach()
+loss = criterion(pred, yb)
+loss.backward()   # crash
+```
+
+Correct:
+
+```python
+pred = model(xb)
+loss = criterion(pred, yb)
+loss.backward()
+```
+
 ## 7. PyTorch Computer Vision
 
 ### 7.1 Preprocessing
@@ -1020,6 +1652,53 @@ class SmallCNN(nn.Module):
 - PyTorch batch shape: `(N, C, H, W)`
 - OpenCV loads color images in **BGR**, not RGB
 - for tiny image datasets, augmentation often matters more than a bigger model
+
+### 7.5 Vision-specific failure patterns
+
+#### `expected input to have 3 channels, but got 1 channels instead`
+
+Meaning:
+
+- the backbone expects RGB input but your data is grayscale
+
+Fix options:
+
+- convert grayscale images to 3 channels during preprocessing
+- or change the first conv layer if the architecture is allowed
+
+```python
+# Repeat one grayscale channel into fake RGB.
+x = x.repeat(1, 3, 1, 1)
+```
+
+#### Images look correct to you, but training is terrible
+
+Common causes:
+
+- you forgot ImageNet normalization for pretrained backbones
+- train and validation transforms are inconsistent
+- labels from folder names were mapped in the wrong order
+
+Quick checks:
+
+```python
+print(train_ds.class_to_idx)
+print(xb.shape, xb.min().item(), xb.max().item())
+```
+
+#### `mat1 and mat2 shapes cannot be multiplied` after a conv stack
+
+Meaning:
+
+- the flattened tensor does not match the first linear layer
+
+Fix:
+
+```python
+# Print the tensor shape right before flattening.
+print(x.shape)
+x = x.reshape(x.size(0), -1)
+```
 
 ## 8. Embeddings and Text
 
@@ -1160,6 +1839,63 @@ print(out.shape)
 - use pretrained models only if weights are already available locally
 - if not sure, use TF-IDF or provided embeddings first
 
+### 8.6 Text / embedding failure patterns
+
+#### Text model validation is suspiciously too good
+
+Common cause:
+
+- `TfidfVectorizer` or tokenizer was fit on the full dataset before the split
+
+Rule:
+
+- split first
+- fit vectorizer on train only
+- transform validation/test with the fitted train vectorizer
+
+#### Sparse text pipeline suddenly uses huge RAM
+
+Common cause:
+
+- converting sparse TF-IDF matrices to dense arrays
+
+Avoid:
+
+```python
+X_dense = X_tfidf.toarray()   # often unnecessary and expensive
+```
+
+Prefer:
+
+- models that accept sparse input directly, such as `LogisticRegression`, `LinearSVC`, `SGDClassifier`
+
+#### Retrieval results look wrong although shapes are fine
+
+Common cause:
+
+- cosine similarity was used without normalizing embeddings
+
+Fix:
+
+```python
+E = E / np.linalg.norm(E, axis=1, keepdims=True)
+q = q / np.linalg.norm(q)
+scores = E @ q
+```
+
+#### `IndexError: index out of range in self` with `nn.Embedding`
+
+Meaning:
+
+- some token id is `>= vocab_size`
+
+Fix:
+
+```python
+print(tokens.min().item(), tokens.max().item())
+embedding = nn.Embedding(vocab_size, embedding_dim)
+```
+
 ## 9. Optimization / Solver Problems
 
 If the problem is discrete and constraint-heavy, think solver before ML.
@@ -1219,31 +1955,116 @@ status = solver.Solve(model)
 
 ## 10. Debugging Checklist
 
+### 10.1 Find the broken stage first
+
+Do not debug everything at once. First identify the failing stage:
+
+- load: files missing, wrong paths, wrong CSV separator, image decode fails
+- split: train/validation misaligned, class missing in one split, leakage
+- features: NaNs, raw strings, unseen categories, wrong normalization
+- model input: wrong tensor shape, wrong dtype, wrong device
+- training: loss does not fall, gradients break, LR too high, OOM
+- validation: `model.eval()` missing, wrong metric, shuffled labels
+- export/submission: wrong column names, wrong file name, wrong JSON/CSV format
+
+### 10.2 60-second debug routine
+
 When the model is broken:
 
-- print shapes
-- print dtypes
-- print a few raw samples
-- inspect target distribution
-- verify train/validation split
-- verify loss matches task
-- verify target dtype
-- check for NaNs
-- try a trivial baseline
-- overfit a tiny batch
-- change learning rate by `x10` and `/10`
+1. print shapes and dtypes
+2. print 3 raw samples and 3 targets
+3. verify the metric and required submission format
+4. verify train/validation split and target balance
+5. run the cheapest baseline
+6. overfit a tiny batch
+7. move LR by `x10` and `/10`
+8. inspect one prediction manually
 
-### Common failures
+### 10.3 Useful prints
 
-- `ValueError: inconsistent numbers of samples`
-- `Input contains NaN`
-- `could not convert string to float`
-- `Expected Long but got Float`
-- `Expected all tensors to be on the same device`
-- `CUDA out of memory`
-- `size mismatch`
+```python
+# Table / NumPy sanity.
+print(X.shape, y.shape)
+print(type(X), type(y))
+print(X.dtype, y.dtype)
 
-### Mandatory optimizer order
+# Raw examples reveal parsing bugs fast.
+print(df.head())
+
+# Target balance matters for both splits and metric choice.
+print(np.unique(y, return_counts=True))
+```
+
+```python
+# PyTorch sanity block.
+print("xb:", xb.shape, xb.dtype, xb.device)
+print("yb:", yb.shape, yb.dtype, yb.device)
+pred = model(xb)
+print("pred:", pred.shape, pred.dtype, pred.device)
+print("pred sample:", pred[:2])
+print("target sample:", yb[:10])
+```
+
+### 10.4 Common failures by segment
+
+#### Data loading
+
+- file exists but you are in the wrong working directory
+- CSV delimiter is not `,`
+- image paths are relative to a different folder
+- labels were read as strings with spaces
+
+Quick checks:
+
+```python
+print(df.shape)
+print(df.columns.tolist())
+print(df.dtypes)
+```
+
+#### Split / leakage
+
+- scaling, PCA, TF-IDF, or imputation fit on full data instead of train only
+- duplicates from train leaking into validation
+- target accidentally left inside features
+
+Quick checks:
+
+```python
+print("target in X:", "target" in X.columns)
+print("train rows:", len(X_train), "val rows:", len(X_val))
+```
+
+#### Modeling
+
+- classifier used for regression
+- regression loss used with integer class labels
+- `softmax` added before `CrossEntropyLoss`
+- binary task coded as multiclass or the reverse
+
+#### Optimization
+
+- LR too high -> loss becomes `nan` or explodes
+- LR too low -> loss barely changes
+- batch too large -> OOM
+- no tiny-batch overfit -> setup bug likely remains
+
+#### Submission / export
+
+- row order changed
+- id column missing
+- probabilities required, but class ids submitted
+- one file or level missing from exported JSON
+
+Quick checks:
+
+```python
+print(submission.head())
+print(submission.shape)
+print(submission.columns.tolist())
+```
+
+### 10.5 Mandatory optimizer order
 
 ```python
 # Clear old gradients first.
@@ -1256,23 +2077,16 @@ loss.backward()
 optimizer.step()
 ```
 
-### Useful prints
+### 10.6 Submission / export sanity block
 
 ```python
-# Check dimensions first.
-print(X.shape, y.shape)
+# Use right before final write.
+print("rows:", len(submission))
+print("columns:", submission.columns.tolist())
+print(submission.head(3))
 
-# Check object types.
-print(type(X), type(y))
-
-# Check dtypes for hidden bugs.
-print(X.dtype, y.dtype)
-
-# Inspect a few rows.
-print(df.head())
-
-# Inspect class balance.
-print(np.unique(y, return_counts=True))
+# For JSON answers, also inspect one entry manually.
+print(list(result.keys())[:3])
 ```
 
 ## 11. Worked Problems From This Repo
@@ -1282,11 +2096,13 @@ These are not just references. They are solved patterns you can reuse.
 ### 11.1 `emotions.ipynb`: sparse adversarial attack on emotion classifier
 
 Problem pattern:
+
 - input is a grayscale `112 x 112` face image
 - model is fixed
 - goal is to change the predicted emotion with very small `L1` pixel edits
 
 What the notebook does:
+
 - loads a pretrained grayscale-adapted `ShuffleNet`
 - wraps preprocessing inside the model
 - uses gradients with respect to the image
@@ -1295,6 +2111,7 @@ What the notebook does:
 - clamps pixels into `[0, 255]`
 
 Key idea:
+
 - do **not** optimize all pixels with large continuous changes
 - instead, rank pixels by `abs(gradient)` and edit only a few each step
 
@@ -1317,6 +2134,7 @@ indices = torch.argsort(grad.view(-1).abs(), descending=True)
 ```
 
 What to remember:
+
 - `targeted` attack: push image toward a chosen target class
 - `untargeted` attack: push image away from the original class
 - use `.clone().detach()` often to avoid autograd mistakes
@@ -1325,10 +2143,12 @@ What to remember:
 ### 11.2 `challenges/nextmovie.ipynb`: ranking by optimized query embedding
 
 Problem pattern:
+
 - you are given movie embeddings
 - you must produce one query vector so that movies rank in a required order
 
 Cheap solution:
+
 - build the query as a weighted sum of the target embeddings
 - subtract the mean embedding of non-target movies
 - normalize the final query
@@ -1354,6 +2174,7 @@ emb = emb / emb.norm()
 ```
 
 Better solution from the notebook:
+
 - optimize the query vector directly with `Adam`
 - define loss terms that force:
   - `target1 > target2 > ... > target5`
@@ -1361,6 +2182,7 @@ Better solution from the notebook:
 - use cosine similarity and exponential hinge-like penalties
 
 What to remember:
+
 - ranking tasks on embeddings often reduce to **query vector design**
 - normalization is critical
 - weighted sums are a strong baseline
@@ -1369,10 +2191,12 @@ What to remember:
 ### 11.3 `challenges/captcha.ipynb`: solve arithmetic CAPTCHA by segmenting and classifying digits
 
 Problem pattern:
+
 - one image contains `digit digit operator digit digit`
 - output is the computed arithmetic result
 
 The notebook solution:
+
 - train MNIST digit classifiers first
 - train one classifier on clean MNIST
 - train another classifier on noisy/augmented MNIST
@@ -1419,15 +2243,18 @@ digit4 = eq[:, :, :, 112:140]
 ```
 
 Operator trick:
+
 - `+` has a vertical stroke
 - `-` mostly does not
 - the notebook uses pixel sums in a central vertical strip to distinguish them
 
 Noise trick:
+
 - for noisy CAPTCHAs, it applies largest-connected-component extraction
 - this removes isolated noise while keeping the main digit structure
 
 What to remember:
+
 - if positions are fixed, segmentation can be a simple slice, not a detector
 - if only one symbol differs structurally, a heuristic may beat training another model
 - train on noisy augmentations if the test data is noisy
@@ -1435,11 +2262,13 @@ What to remember:
 ### 11.4 `pdtn2025/deepfakes_final.ipynb`: binary image classification with a required backbone
 
 Problem pattern:
+
 - image classification
 - architecture may be constrained
 - dataset is split into train / validation folders
 
 What the notebook does:
+
 - uses `ImageFolder`-style dataset setup
 - normalizes images with ImageNet statistics
 - uses `torchvision.models.shufflenet_v2_x1_0`
@@ -1450,15 +2279,20 @@ What the notebook does:
 Important pattern:
 
 ```python
+# Load the required backbone. Pretrained weights are the strongest cheap start.
 model = models.shufflenet_v2_x1_0(
     weights=models.ShuffleNet_V2_X1_0_Weights.IMAGENET1K_V1
 )
+
+# Replace only the final classifier so logits match the two contest classes.
 model.fc = torch.nn.Linear(model.fc.in_features, 2)
 
+# Small LR because the pretrained backbone already knows useful visual features.
 optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 ```
 
 What to remember:
+
 - when the architecture is fixed, the main gains come from:
   - pretrained initialization
   - correct transforms
@@ -1468,11 +2302,13 @@ What to remember:
 ### 11.5 `pdtn2025/Αντίγραφο_embeddings_greedy_torch (1).ipynb`: word-chain search on embeddings
 
 Problem pattern:
+
 - words are nodes
 - cosine similarity defines closeness
 - you need a chain from one word to another
 
 What the notebook does:
+
 - reads embeddings
 - L2-normalizes them
 - computes pairwise similarities with matrix multiplication
@@ -1490,6 +2326,7 @@ greedy_best = torch.topk(sim_full, k=32057, axis=1)
 ```
 
 What to remember:
+
 - if all vectors are normalized, dot product = cosine similarity
 - matrix multiplication gives all-vs-all similarity fast
 - greedy is a useful baseline but may fail globally
@@ -1501,11 +2338,13 @@ What to remember:
 ### 11.6 `pdtn2025/Αντίγραφο_knit.ipynb`: optimize line weights to reconstruct an image
 
 Problem pattern:
+
 - output is not labels but parameters of a generative construction
 - here the construction is a set of weighted lines
 - loss is simply image reconstruction error
 
 What the notebook does:
+
 - defines a differentiable `linesToImage(lines)`
 - initializes line weights as zeros
 - optimizes those weights directly with SGD
@@ -1515,21 +2354,184 @@ What the notebook does:
 Important pattern:
 
 ```python
+# `lines` are the actual answer variables, not normal dataset features.
 lines = torch.zeros((N//2, N), requires_grad=True)
 optimizer = optim.SGD([lines], lr=0.5)
 
 for step in range(num_steps):
+    # Render the current candidate image from the current line weights.
     generated_image = linesToImage(lines)
+
+    # Reconstruction loss: the rendered image should match the target image.
     loss = torch.mean((generated_image - target) ** 2)
+
+    # Optimize the line parameters directly.
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
 ```
 
 What to remember:
+
 - sometimes the variable you optimize is **not model weights**, but the answer itself
 - if the rendering process is differentiable, you can optimize the answer directly
 - this is a strong pattern for inverse problems and reconstruction tasks
+
+### 11.7 `challenges/squarepainting.ipynb`: fit a coordinate -> RGB function with a fixed MLP
+
+Problem pattern:
+
+- each input is a coordinate pair `(x, y)`
+- each target is a continuous vector `(r, g, b)`
+- architecture is fixed, so tuning happens in the training loop and sampling density
+- submission is the trained weights, not a predicted table
+
+What the notebook does:
+
+- samples a dense grid over the unit square
+- keeps coordinate inputs and RGB targets as separate tensors
+- trains the same fixed architecture on several target functions/images
+- renders the learned function back to an image by querying a dense grid
+- exports the linear-layer weights to JSON
+
+Why this matters:
+
+- the same pattern appears in coordinate regression, neural fields, image-as-function tasks, and any problem where the answer is a continuous mapping instead of class labels
+
+Reusable dataset pattern:
+
+```python
+import numpy as np
+import torch
+from torch.utils.data import TensorDataset, random_split
+
+def generate_ds(target_f, samples=200):
+    # Build a dense coordinate grid in [0, 1] x [0, 1].
+    steps = np.linspace(0.0, 1.0, samples, dtype=np.float32)
+    inputs = []
+    targets = []
+
+    for x in steps:
+        for y in steps:
+            # Each input is one coordinate pair.
+            inputs.append([x, y])
+
+            # Each target is the RGB value at that coordinate.
+            targets.append(target_f(float(x), float(y)))
+
+    inputs = torch.tensor(inputs, dtype=torch.float32)
+    targets = torch.tensor(targets, dtype=torch.float32)
+    return TensorDataset(inputs, targets)
+
+full_ds = generate_ds(target_f, samples=200)
+train_size = int(0.8 * len(full_ds))
+val_size = len(full_ds) - train_size
+train_ds, val_ds = random_split(full_ds, [train_size, val_size])
+```
+
+Reusable architecture + training loop:
+
+```python
+import copy
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader
+
+def Net():
+    # Fixed contest architecture: 2 inputs -> hidden MLP -> 3 RGB outputs.
+    return nn.Sequential(
+        nn.Linear(2, 20), nn.ReLU(),
+        nn.Linear(20, 20), nn.ReLU(),
+        nn.Linear(20, 20), nn.ReLU(),
+        nn.Linear(20, 20), nn.ReLU(),
+        nn.Linear(20, 20), nn.ReLU(),
+        nn.Linear(20, 20), nn.ReLU(),
+        nn.Linear(20, 3)
+    )
+
+def fit_coordinate_model(target_f, samples=200, epochs=300, batch_size=256):
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = Net().to(device)
+
+    # Build train/validation splits from one dense coordinate dataset.
+    full_ds = generate_ds(target_f, samples=samples)
+    train_size = int(0.8 * len(full_ds))
+    val_size = len(full_ds) - train_size
+    train_ds, val_ds = random_split(full_ds, [train_size, val_size])
+
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=0)
+    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=0)
+
+    criterion = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=2e-3)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
+
+    # Keep the best validation checkpoint, not just the final epoch.
+    best_val = float("inf")
+    best_state = copy.deepcopy(model.state_dict())
+
+    for epoch in range(epochs):
+        model.train()
+        for xb, yb in train_loader:
+            xb = xb.to(device)
+            yb = yb.to(device)
+
+            optimizer.zero_grad()
+            pred = model(xb)
+            loss = criterion(pred, yb)
+            loss.backward()
+            optimizer.step()
+
+        model.eval()
+        total_val_loss = 0.0
+        with torch.no_grad():
+            for xb, yb in val_loader:
+                xb = xb.to(device)
+                yb = yb.to(device)
+                total_val_loss += criterion(model(xb), yb).item()
+
+        val_loss = total_val_loss / len(val_loader)
+        scheduler.step()
+
+        if val_loss < best_val:
+            best_val = val_loss
+            best_state = copy.deepcopy(model.state_dict())
+
+    model.load_state_dict(best_state)
+    return model
+```
+
+Reusable export pattern:
+
+```python
+def export_weights(net):
+    layers = []
+
+    for layer in net:
+        if isinstance(layer, nn.Linear):
+            # Export only trainable linear layers in plain Python lists.
+            layers.append({
+                "weights": layer.weight.detach().cpu().tolist(),
+                "bias": layer.bias.detach().cpu().tolist(),
+            })
+
+    return {"layers": layers}
+```
+
+Important failure modes:
+
+- do **not** `stack` `(N, 2)` coordinate inputs with `(N, 3)` RGB targets
+- keep targets as `float32`
+- if the fit is blocky, increase sampling density before changing everything else
+- if validation is much worse than train, keep a best checkpoint and reduce LR
+- on Windows/notebooks, set `num_workers=0` first if loader workers crash
+
+What to remember:
+
+- this is supervised regression, not classification
+- the final layer should output `3` floats, one for each RGB channel
+- `MSELoss` is the natural first loss
+- the answer can be the model weights themselves when the contest wants a function representation
 
 ## 12. Highest-Value Local Repo Files
 
@@ -1548,6 +2550,8 @@ Review these before the contest:
 - `emotions.ipynb`
 - `challenges/nextmovie.ipynb`
 - `challenges/captcha.ipynb`
+- `challenges/squarepainting.ipynb`
+- `challenges/squarepainting.py`
 - `pdtn2025/deepfakes_final.ipynb`
 - `pdtn2025/Αντίγραφο_embeddings_greedy_torch (1).ipynb`
 - `pdtn2025/Αντίγραφο_knit.ipynb`

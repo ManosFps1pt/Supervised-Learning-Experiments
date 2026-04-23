@@ -1,0 +1,2281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDTN Phase B Offline Notes</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  :root { --fg:#111; --muted:#555; --rule:#d9d9d9; --code-bg:#f5f5f5; }
+  html { font-size: 14px; }
+  body { font-family: Georgia, 'Times New Roman', serif; color: var(--fg); line-height: 1.38; max-width: 900px; margin: 0 auto; }
+  h1, h2, h3, h4 { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.2; page-break-after: avoid; }
+  h1 { font-size: 24px; margin: 0 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--rule); }
+  h2 { font-size: 18px; margin: 22px 0 10px; }
+  h3 { font-size: 15px; margin: 18px 0 8px; }
+  h4 { font-size: 13px; margin: 14px 0 6px; }
+  p { margin: 6px 0; }
+  ul, ol { margin: 6px 0 10px 20px; }
+  li { margin: 2px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0 14px; font-size: 0.95em; }
+  th, td { border: 1px solid #d8d8d8; padding: 6px 8px; vertical-align: top; }
+  th { background: #f1f1f1; text-align: left; }
+  code { font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.9em; background: var(--code-bg); padding: 0.08em 0.28em; border-radius: 4px; }
+  pre { background: var(--code-bg); padding: 10px 12px; border-radius: 6px; overflow-wrap: anywhere; white-space: pre-wrap; word-break: break-word; page-break-inside: avoid; }
+  pre code { background: transparent; padding: 0; display: block; }
+  blockquote { margin: 10px 0; padding-left: 12px; border-left: 3px solid var(--rule); color: var(--muted); }
+</style>
+</head>
+<body>
+<h1>PDTN Phase B Offline Notes</h1>
+<p>This file is meant to be useful during the contest, not descriptive about the contest.</p>
+<p>Keep only what helps you solve problems fast:</p>
+<ul>
+<li>no normal internet</li>
+<li>local docs may exist, but search may be weak</li>
+<li>code templates matter more than theory paragraphs</li>
+<li>baseline first, then improvements</li>
+</ul>
+<h2>1. Fast Contest Strategy</h2>
+<p>For each problem, identify these immediately:</p>
+<ul>
+<li>task type: regression / classification / clustering / retrieval / optimization</li>
+<li>input type: tabular / text / embeddings / image / sequence</li>
+<li>metric: accuracy / F1 / MAE / RMSE / custom</li>
+<li>output format: labels / probabilities / CSV / notebook output</li>
+<li>restrictions: fixed model / no downloads / local weights only</li>
+</ul>
+<p>Work in this order:</p>
+<ol>
+<li>understand metric and data</li>
+<li>build the cheapest correct baseline</li>
+<li>validate locally</li>
+<li>submit early</li>
+<li>improve only if there is clear signal</li>
+</ol>
+<h2>2. Problem -&gt; First Baseline</h2>
+<table>
+<thead>
+<tr>
+<th>Problem pattern</th>
+<th>First baseline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tabular classification</td>
+<td><code>XGBoost</code> or <code>LogisticRegression</code></td>
+</tr>
+<tr>
+<td>tabular regression</td>
+<td><code>XGBoost</code>, <code>Ridge</code>, <code>LinearRegression</code></td>
+</tr>
+<tr>
+<td>embeddings given</td>
+<td>treat embeddings as normal dense features</td>
+</tr>
+<tr>
+<td>text classification</td>
+<td><code>TF-IDF + LogisticRegression</code></td>
+</tr>
+<tr>
+<td>image classification, small dataset</td>
+<td>pretrained <code>resnet18</code> with frozen backbone</td>
+</tr>
+<tr>
+<td>custom small neural net task</td>
+<td>simple MLP + Adam/AdamW + correct loss</td>
+</tr>
+<tr>
+<td>unlabeled vectors</td>
+<td><code>KMeans</code> + PCA visualization</td>
+</tr>
+<tr>
+<td>margin-friendly smaller classification dataset</td>
+<td><code>SVM</code> after scaling</td>
+</tr>
+<tr>
+<td>assignment / scheduling / constraints</td>
+<td><code>ortools</code> / <code>pulp</code> / <code>z3</code></td>
+</tr>
+</tbody>
+</table>
+<h2>3. Data Processing</h2>
+<h3>3.1 Load and inspect fast</h3>
+<pre><code class="language-python">import pandas as pd
+import numpy as np
+
+# Load the training table.
+df = pd.read_csv(&quot;train.csv&quot;)
+
+# Basic shape: rows, columns.
+print(df.shape)
+
+# First few rows to inspect column names and obvious issues.
+print(df.head())
+
+# Dtypes help you separate numeric vs categorical columns.
+print(df.dtypes)
+
+# Missing values report: start with the worst columns.
+print(df.isna().sum().sort_values(ascending=False).head(20))
+</code></pre>
+<h3>3.2 Train/validation split</h3>
+<pre><code class="language-python">from sklearn.model_selection import train_test_split
+
+# Separate features from target.
+X = df.drop(columns=[&quot;target&quot;])
+y = df[&quot;target&quot;]
+
+# Stratify for classification when the target is class-like.
+# This keeps class ratios similar in train and validation.
+X_train, X_val, y_train, y_val = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y if y.nunique() &lt; 20 else None
+)
+</code></pre>
+<h3>3.3 Missing values</h3>
+<pre><code class="language-python"># Numeric columns: median is a safe cheap default.
+num_cols = X_train.select_dtypes(include=[&quot;number&quot;]).columns
+
+# Non-numeric columns: usually categorical or text-like.
+cat_cols = X_train.select_dtypes(exclude=[&quot;number&quot;]).columns
+
+for c in num_cols:
+    med = X_train[c].median()
+    X_train[c] = X_train[c].fillna(med)
+    X_val[c] = X_val[c].fillna(med)
+
+for c in cat_cols:
+    # Use a visible placeholder instead of dropping rows.
+    X_train[c] = X_train[c].fillna(&quot;missing&quot;)
+    X_val[c] = X_val[c].fillna(&quot;missing&quot;)
+</code></pre>
+<h3>3.4 Encoding and scaling</h3>
+<p>Rules:</p>
+<ul>
+<li>scale for linear models, SVM, KMeans, neural nets</li>
+<li>do not bother scaling for trees and boosting</li>
+<li>one-hot is fine for linear models and neural nets</li>
+<li>for text use TF-IDF, not raw strings</li>
+</ul>
+<pre><code class="language-python">from sklearn.preprocessing import StandardScaler
+
+# Fit only on train data to avoid leakage.
+scaler = StandardScaler()
+
+# Scale numeric features only.
+Xtr_num = scaler.fit_transform(X_train[num_cols])
+Xva_num = scaler.transform(X_val[num_cols])
+</code></pre>
+<pre><code class="language-python"># One-hot encode categoricals when using linear models / MLPs.
+X_train_oh = pd.get_dummies(X_train, dtype=float)
+X_val_oh = pd.get_dummies(X_val, dtype=float)
+
+# Align columns because validation may miss categories seen in train or vice versa.
+X_val_oh = X_val_oh.reindex(columns=X_train_oh.columns, fill_value=0)
+</code></pre>
+<h3>3.5 Metrics</h3>
+<pre><code class="language-python">from sklearn.metrics import (
+    accuracy_score,
+    f1_score,
+    mean_absolute_error,
+    mean_squared_error,
+    confusion_matrix,
+    classification_report,
+)
+</code></pre>
+<h3>3.6 NumPy quick reference</h3>
+<p>I checked the available NumPy material in:</p>
+<ul>
+<li><code>Numpy Tutorial/numpy_tutorial.ipynb</code></li>
+</ul>
+<p>I also checked <code>resourses/</code>, but that folder currently contains:</p>
+<ul>
+<li><code>resourses/notes_chapter_Convolutional_Neural_Networks.pdf</code></li>
+</ul>
+<p>So for NumPy, the useful local source is the tutorial notebook.</p>
+<h4>Array creation and dtype</h4>
+<pre><code class="language-python">import numpy as np
+
+# Create a 1D array from a Python list.
+x = np.array([1, 2, 3, 4], dtype=np.float32)
+
+# Range creation: start, stop, step.
+a = np.arange(0, 10, 2)
+
+# Evenly spaced points between two values.
+b = np.linspace(0.0, 1.0, 5)
+
+# All zeros, ones, constant-filled arrays.
+z = np.zeros((3, 4))
+o = np.ones((2, 2))
+f = np.full((2, 3), 7.0)
+
+# Identity matrix.
+I = np.eye(4)
+
+print(x.dtype)
+print(a)
+print(b)
+</code></pre>
+<h4>Shape, dimensions, reshape, transpose</h4>
+<pre><code class="language-python"># 2D matrix with 3 rows and 4 columns.
+X = np.arange(12).reshape(3, 4)
+
+# Basic array information.
+print(X.shape)   # (3, 4)
+print(X.ndim)    # number of dimensions
+print(X.size)    # total number of elements
+
+# Flatten to 1D.
+flat = X.reshape(-1)
+
+# Transpose rows &lt;-&gt; columns.
+XT = X.T
+
+# Add a new axis: useful for broadcasting.
+col = np.arange(3).reshape(-1, 1)
+row = np.arange(4).reshape(1, -1)
+</code></pre>
+<h4>Indexing, slicing, masking</h4>
+<pre><code class="language-python">X = np.arange(20).reshape(4, 5)
+
+# Single element.
+print(X[2, 3])
+
+# Row slice.
+print(X[1:3])
+
+# Column slice.
+print(X[:, 2])
+
+# Submatrix.
+print(X[1:3, 2:5])
+
+# Boolean mask.
+mask = X % 2 == 0
+evens = X[mask]
+
+# Find coordinates where condition holds.
+coords = np.argwhere(X &gt; 10)
+
+# Conditional replacement.
+Y = np.where(X &gt; 10, 1, 0)
+</code></pre>
+<h4>Concatenate, split, stack</h4>
+<pre><code class="language-python">a = np.array([1, 2, 3])
+b = np.array([4, 5, 6])
+
+# End-to-end concatenation.
+ab = np.concatenate([a, b])
+
+# Horizontal / vertical stack for matrices.
+A = np.ones((2, 3))
+B = np.zeros((2, 3))
+
+H = np.hstack([A, B])   # shape (2, 6)
+V = np.vstack([A, B])   # shape (4, 3)
+C = np.column_stack([a, b])  # columns from 1D arrays
+
+# Split arrays into pieces.
+parts = np.array_split(np.arange(10), 3)
+</code></pre>
+<h4>Arithmetic, broadcasting, clipping</h4>
+<pre><code class="language-python">x = np.array([1, 2, 3], dtype=np.float32)
+y = np.array([10, 20, 30], dtype=np.float32)
+
+# Elementwise arithmetic.
+print(x + y)
+print(x * y)
+print(x / y)
+
+# Scalar broadcasting.
+print(x + 5)
+
+# Broadcast row + column to a matrix.
+row = np.arange(4).reshape(1, 4)
+col = np.arange(3).reshape(3, 1)
+grid = row + col
+
+# Clamp values into a safe range.
+safe = np.clip(grid, 0, 4)
+</code></pre>
+<h4>Statistics you will actually use</h4>
+<pre><code class="language-python">X = np.arange(12).reshape(3, 4).astype(np.float32)
+
+# Global statistics.
+print(np.mean(X))
+print(np.std(X))
+print(np.var(X))
+print(np.min(X))
+print(np.max(X))
+print(np.sum(X))
+
+# Per-axis statistics.
+print(np.mean(X, axis=0))   # column means
+print(np.mean(X, axis=1))   # row means
+
+# Robust statistics.
+print(np.median(X))
+print(np.quantile(X, 0.25))
+print(np.percentile(X, 90))
+</code></pre>
+<h4>Sorting and ranking</h4>
+<pre><code class="language-python">x = np.array([5, 1, 9, 3])
+
+# Sorted values.
+print(np.sort(x))
+
+# Index of max / min.
+print(np.argmax(x))
+print(np.argmin(x))
+
+# Ranking from largest to smallest.
+order = np.argsort(-x)
+print(order)
+
+# Search insertion position in sorted array.
+sorted_x = np.sort(x)
+pos = np.searchsorted(sorted_x, 4)
+print(pos)
+</code></pre>
+<h4>NaN / inf safety</h4>
+<pre><code class="language-python">x = np.array([1.0, np.nan, np.inf, 4.0])
+
+# Detect invalid values before model training.
+print(np.isnan(x))
+print(np.isinf(x))
+print(np.any(np.isnan(x)))
+print(np.all(np.isfinite(x)) if hasattr(np, 'isfinite') else 'use isnan/isinf')
+</code></pre>
+<h4>Linear algebra</h4>
+<pre><code class="language-python">A = np.array([[1.0, 2.0], [3.0, 4.0]])
+B = np.array([[5.0], [6.0]])
+
+# Matrix multiplication.
+print(A @ B)
+print(np.dot(A, B))
+
+# Useful norms.
+print(np.linalg.norm(A))
+print(np.linalg.norm(A, axis=1))  # row norms
+
+# Solve / inspect.
+print(np.linalg.det(A))
+print(np.linalg.inv(A))
+</code></pre>
+<h4>Trig / exp / log</h4>
+<pre><code class="language-python">x = np.linspace(0, np.pi, 5)
+
+print(np.sin(x))
+print(np.cos(x))
+print(np.exp(x))
+print(np.log(np.array([1.0, 2.0, 4.0])))
+print(np.sqrt(np.array([1.0, 4.0, 9.0])))
+</code></pre>
+<h4>NumPy functions that appeared in the local tutorial</h4>
+<p>High-yield ones from <code>Numpy Tutorial/numpy_tutorial.ipynb</code>:</p>
+<ul>
+<li><code>np.array</code></li>
+<li><code>np.arange</code></li>
+<li><code>np.linspace</code></li>
+<li><code>np.zeros</code>, <code>np.ones</code>, <code>np.full</code>, <code>np.eye</code></li>
+<li><code>np.reshape</code></li>
+<li><code>np.concatenate</code>, <code>np.hstack</code>, <code>np.vstack</code>, <code>np.column_stack</code>, <code>np.split</code>, <code>np.array_split</code></li>
+<li><code>np.where</code>, <code>np.argwhere</code></li>
+<li><code>np.sort</code>, <code>np.argsort</code>, <code>np.argmax</code>, <code>np.argmin</code>, <code>np.searchsorted</code></li>
+<li><code>np.mean</code>, <code>np.median</code>, <code>np.std</code>, <code>np.var</code>, <code>np.min</code>, <code>np.max</code>, <code>np.sum</code></li>
+<li><code>np.quantile</code>, <code>np.percentile</code></li>
+<li><code>np.isnan</code>, <code>np.isinf</code>, <code>np.any</code>, <code>np.all</code></li>
+<li><code>np.dot</code></li>
+<li><code>np.linalg.norm</code>, <code>np.linalg.inv</code>, <code>np.linalg.det</code></li>
+<li><code>np.sin</code>, <code>np.cos</code>, <code>np.exp</code>, <code>np.log</code>, <code>np.sqrt</code></li>
+<li><code>np.clip</code>, <code>np.unique</code></li>
+</ul>
+<h4>NumPy contest advice</h4>
+<ul>
+<li>if shapes are confusing, print <code>.shape</code> after every transformation</li>
+<li>prefer vectorized operations over Python loops</li>
+<li>remember <code>axis=0</code> usually means "down the rows / per column"</li>
+<li>remember <code>axis=1</code> usually means "across columns / per row"</li>
+<li>use boolean masks instead of slow manual loops</li>
+<li>use <code>astype(np.float32)</code> before sending arrays to PyTorch</li>
+</ul>
+<h2>4. Classical Machine Learning</h2>
+<h3>4.1 Linear Regression / Ridge / Lasso</h3>
+<p>Use when the target is continuous.</p>
+<pre><code class="language-python">from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+# Ridge is often safer than plain LinearRegression because it regularizes weights.
+model = Ridge(alpha=1.0)
+
+# Train on the scaled numeric matrix.
+model.fit(Xtr_num, y_train)
+
+# Predict on validation data.
+pred = model.predict(Xva_num)
+
+# MAE is robust and easy to interpret.
+mae = mean_absolute_error(y_val, pred)
+
+# RMSE punishes large mistakes more strongly.
+rmse = mean_squared_error(y_val, pred, squared=False)
+
+print(&quot;MAE:&quot;, mae)
+print(&quot;RMSE:&quot;, rmse)
+</code></pre>
+<h3>4.2 Logistic Regression</h3>
+<p>Use for classification, especially tabular data or TF-IDF features.</p>
+<pre><code class="language-python">from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, f1_score
+
+# class_weight=&quot;balanced&quot; is often useful when classes are imbalanced.
+model = LogisticRegression(
+    max_iter=2000,
+    n_jobs=-1,
+    class_weight=&quot;balanced&quot;
+)
+
+# Train on scaled or sparse features.
+model.fit(Xtr_num, y_train)
+
+# Class predictions.
+pred = model.predict(Xva_num)
+
+print(&quot;acc:&quot;, accuracy_score(y_val, pred))
+print(&quot;f1:&quot;, f1_score(y_val, pred, average=&quot;weighted&quot;))
+</code></pre>
+<h3>4.3 Decision Tree</h3>
+<p>Good cheap baseline. Easy to overfit.</p>
+<pre><code class="language-python">from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+
+# Keep depth limited at first.
+model = DecisionTreeClassifier(
+    max_depth=6,
+    min_samples_leaf=5,
+    random_state=42
+)
+
+# Tree models can use the original tabular data directly.
+model.fit(X_train, y_train)
+pred = model.predict(X_val)
+</code></pre>
+<p>Notes:</p>
+<ul>
+<li>increase <code>max_depth</code> only if clearly underfitting</li>
+<li>use <code>min_samples_leaf</code> to reduce noisy splits</li>
+<li>trees do not need scaling</li>
+</ul>
+<h3>4.4 XGBoost</h3>
+<p>Very strong default for tabular problems.</p>
+<pre><code class="language-python">from xgboost import XGBClassifier, XGBRegressor
+
+# Strong default classifier for many tabular tasks.
+model = XGBClassifier(
+    n_estimators=400,        # more trees, smaller steps
+    max_depth=6,             # not too deep
+    learning_rate=0.05,      # safer than 0.3
+    subsample=0.9,           # mild row sampling
+    colsample_bytree=0.9,    # mild feature sampling
+    eval_metric=&quot;mlogloss&quot;,  # avoid warning + set classification metric
+    random_state=42
+)
+
+# X_train_encoded should be numeric only.
+model.fit(X_train_encoded, y_train)
+pred = model.predict(X_val_encoded)
+</code></pre>
+<pre><code class="language-python"># Strong default regressor for tabular regression.
+reg = XGBRegressor(
+    n_estimators=500,
+    max_depth=6,
+    learning_rate=0.05,
+    subsample=0.9,
+    colsample_bytree=0.9,
+    random_state=42
+)
+
+reg.fit(X_train_encoded, y_train)
+pred = reg.predict(X_val_encoded)
+</code></pre>
+<h3>4.5 KMeans</h3>
+<p>Use for unsupervised clustering.</p>
+<pre><code class="language-python">from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.decomposition import PCA
+
+# KMeans is distance-based, so scaling is important.
+X_scaled = scaler.fit_transform(X)
+
+best_k = None
+best_score = -1
+
+for k in range(2, 11):
+    # n_init=20 gives more stable clustering.
+    km = KMeans(n_clusters=k, n_init=20, random_state=42)
+    labels = km.fit_predict(X_scaled)
+    score = silhouette_score(X_scaled, labels)
+
+    if score &gt; best_score:
+        best_score = score
+        best_k = k
+
+print(&quot;best_k:&quot;, best_k, &quot;silhouette:&quot;, best_score)
+
+# PCA is a fast way to visualize high-dimensional clusters.
+pca = PCA(n_components=2)
+X_2d = pca.fit_transform(X_scaled)
+</code></pre>
+<h3>4.6 SVM</h3>
+<p>Good for smaller datasets. Do not start here if the dataset is huge.</p>
+<pre><code class="language-python">from sklearn.svm import SVC, SVR
+
+# RBF kernel is a common nonlinear baseline.
+clf = SVC(
+    C=1.0,
+    kernel=&quot;rbf&quot;,
+    gamma=&quot;scale&quot;,
+    class_weight=&quot;balanced&quot;
+)
+
+# SVM needs scaled features.
+clf.fit(Xtr_num, y_train)
+pred = clf.predict(Xva_num)
+</code></pre>
+<h3>4.7 Common pandas / sklearn errors and fast fixes</h3>
+<h4><code>ValueError: could not convert string to float</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>a numeric model received raw text or categorical columns</li>
+</ul>
+<p>Fast check:</p>
+<pre><code class="language-python">print(X_train.select_dtypes(exclude=[&quot;number&quot;]).columns.tolist())
+</code></pre>
+<p>Fix:</p>
+<pre><code class="language-python"># Keep only numeric columns, or encode categoricals explicitly.
+X_train_oh = pd.get_dummies(X_train, dtype=float)
+X_val_oh = pd.get_dummies(X_val, dtype=float)
+
+# Validation must have the exact same columns as training.
+X_val_oh = X_val_oh.reindex(columns=X_train_oh.columns, fill_value=0)
+</code></pre>
+<h4><code>Input X contains NaN</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>the estimator does not accept missing values directly</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python"># Median for numeric columns is the safest cheap default.
+for c in X_train.select_dtypes(include=[&quot;number&quot;]).columns:
+    med = X_train[c].median()
+    X_train[c] = X_train[c].fillna(med)
+    X_val[c] = X_val[c].fillna(med)
+</code></pre>
+<p>Rule:</p>
+<ul>
+<li>fit missing-value handling on train only</li>
+<li>apply the same fill values to validation and test</li>
+</ul>
+<h4><code>Found input variables with inconsistent numbers of samples</code></h4>
+<p>Meaning:</p>
+<ul>
+<li><code>X</code> and <code>y</code> no longer have the same number of rows</li>
+<li>common cause: filtering rows in <code>X</code> but not in <code>y</code></li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">print(len(X), len(y))
+
+# Build one mask, then apply it to both X and y.
+mask = X.notna().all(axis=1)
+X = X.loc[mask].reset_index(drop=True)
+y = y.loc[mask].reset_index(drop=True)
+</code></pre>
+<h4><code>The feature names should match those that were passed during fit</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>train and validation columns differ</li>
+<li>common after one-hot encoding or manual column selection</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python"># Force the exact training column order before predict().
+X_val_oh = X_val_oh.reindex(columns=X_train_oh.columns, fill_value=0)
+pred = clf.predict(X_val_oh)
+</code></pre>
+<h4><code>X has n features, but model expects m features</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>you trained on one feature matrix and predicted on another one with a different width</li>
+</ul>
+<p>Fast check:</p>
+<pre><code class="language-python">print(X_train_oh.shape)
+print(X_val_oh.shape)
+</code></pre>
+<p>Most common fixes:</p>
+<ul>
+<li>reindex validation columns to training columns</li>
+<li>do not fit PCA / scaler / vectorizer separately on validation</li>
+<li>do not drop columns on only one split</li>
+</ul>
+<h4><code>Unknown label type: continuous</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>you used a classifier for a regression target</li>
+</ul>
+<p>Fix:</p>
+<ul>
+<li>if the target is a real number, use regressor classes like <code>Ridge</code>, <code>RandomForestRegressor</code>, <code>XGBRegressor</code></li>
+<li>if it is classification, make sure labels are true class ids, not floats like <code>0.0, 1.0, 2.0</code></li>
+</ul>
+<h4><code>This solver needs samples of at least 2 classes</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>one split contains only one class</li>
+<li>common on tiny datasets or non-stratified splits</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">print(y_train.value_counts())
+
+X_train, X_val, y_train, y_val = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+</code></pre>
+<h2>5. PyTorch Simple Models</h2>
+<p>Use the exact training function style you already use.</p>
+<h3>5.1 Tabular MLP for classification with <code>nn.Module</code></h3>
+<pre><code class="language-python">import torch
+import torch.nn as nn
+from torch.utils.data import TensorDataset, DataLoader
+
+# Pick GPU if available.
+device = &quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;
+
+# Convert NumPy arrays to PyTorch tensors.
+Xtr = torch.tensor(X_train_np, dtype=torch.float32)
+Xva = torch.tensor(X_val_np, dtype=torch.float32)
+ytr = torch.tensor(y_train_np, dtype=torch.long)   # long for CrossEntropyLoss
+yva = torch.tensor(y_val_np, dtype=torch.long)
+
+# Build datasets and loaders.
+train_loader = DataLoader(TensorDataset(Xtr, ytr), batch_size=128, shuffle=True)
+val_loader = DataLoader(TensorDataset(Xva, yva), batch_size=256, shuffle=False)
+
+class TabularClassifier(nn.Module):
+    def __init__(self, input_dim, num_classes):
+        super(TabularClassifier, self).__init__()
+        # First hidden layer: expand feature space.
+        self.fc1 = nn.Linear(input_dim, 256)
+        # Second hidden layer: compress toward useful representation.
+        self.fc2 = nn.Linear(256, 128)
+        # Final layer outputs raw logits, one per class.
+        self.fc3 = nn.Linear(128, num_classes)
+        # ReLU is the standard safe activation.
+        self.relu = nn.ReLU()
+        # Dropout helps fight overfitting.
+        self.dropout = nn.Dropout(0.2)
+
+    def forward(self, x):
+        # Hidden block 1.
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+
+        # Hidden block 2.
+        x = self.fc2(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+
+        # Final logits. No softmax here because CrossEntropyLoss already handles it.
+        x = self.fc3(x)
+        return x
+
+model = TabularClassifier(input_dim=Xtr.shape[1], num_classes=num_classes).to(device)
+
+# Standard classification loss.
+criterion = nn.CrossEntropyLoss()
+
+# AdamW is a strong default optimizer.
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
+</code></pre>
+<h3>5.2 Tabular MLP for regression with <code>nn.Module</code></h3>
+<pre><code class="language-python">class TabularRegressor(nn.Module):
+    def __init__(self, input_dim):
+        super(TabularRegressor, self).__init__()
+        # Same structure as classification, but final output is a single number.
+        self.fc1 = nn.Linear(input_dim, 256)
+        self.fc2 = nn.Linear(256, 128)
+        self.fc3 = nn.Linear(128, 1)
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(0.2)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+
+        x = self.fc2(x)
+        x = self.relu(x)
+
+        # One scalar per sample.
+        x = self.fc3(x)
+        return x
+
+model = TabularRegressor(input_dim=Xtr.shape[1]).to(device)
+
+# Regression target should be float, not long.
+ytr = torch.tensor(y_train_np, dtype=torch.float32)
+yva = torch.tensor(y_val_np, dtype=torch.float32)
+
+train_loader = DataLoader(TensorDataset(Xtr, ytr), batch_size=128, shuffle=True)
+val_loader = DataLoader(TensorDataset(Xva, yva), batch_size=256, shuffle=False)
+
+# MSE is the default regression loss.
+criterion = nn.MSELoss()
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
+</code></pre>
+<h3>5.3 Training function from <code>comp/train_func.py</code></h3>
+<pre><code class="language-python">import torch
+import copy
+import torch.nn.functional as F
+import matplotlib.pyplot as plt
+
+def train(model, train_loader, test_loader, optimizer, epochs, criterion):
+    &quot;&quot;&quot;
+    Trains a PyTorch model, evaluates it on a test set, and plots the results.
+    &quot;&quot;&quot;
+    # Select GPU if available.
+    device = torch.device(&quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;)
+
+    # Move model once to the device.
+    model = model.to(device, non_blocking=True)
+
+    # Decay LR by a factor of 0.1 every 7 epochs.
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+
+    # Store curves for plotting later.
+    train_losses = []
+    test_losses = []
+    test_accuracies = []
+
+    # Track best validation accuracy and weights.
+    best_accuracy = 0
+    best_model_wts = copy.deepcopy(model.state_dict())
+
+    # Main training loop.
+    for epoch in range(epochs):
+        # Put the model in training mode.
+        model.train()
+        total_loss = 0
+
+        # Training pass over all mini-batches.
+        for batch_x, batch_y in train_loader:
+            # Move batch to GPU/CPU.
+            batch_x = batch_x.to(device, non_blocking=True)
+            batch_y = batch_y.to(device, non_blocking=True)
+
+            # Clear old gradients.
+            optimizer.zero_grad()
+
+            # Forward pass.
+            outputs = model(batch_x)
+
+            # Compute loss.
+            loss = criterion(outputs, batch_y)
+
+            # Backward pass.
+            loss.backward()
+
+            # Update weights.
+            optimizer.step()
+
+            # Accumulate batch loss.
+            total_loss += loss.item()
+
+        # Step the scheduler once per epoch.
+        scheduler.step()
+
+        # Average train loss for this epoch.
+        train_losses.append(total_loss / len(train_loader))
+
+        # Validation phase.
+        model.eval()
+        total_test_loss = 0
+        correct = 0
+        total = 0
+
+        # Turn off gradients during validation.
+        with torch.no_grad():
+            for batch_x, batch_y in test_loader:
+                # Move validation batch to device.
+                batch_x = batch_x.to(device)
+                batch_y = batch_y.to(device)
+
+                # Forward pass.
+                outputs = model(batch_x)
+
+                # Validation loss.
+                loss = criterion(outputs, batch_y)
+                total_test_loss += loss.item()
+
+                # Predicted class = largest logit.
+                _, predicted = torch.max(outputs.data, 1)
+                total += batch_y.size(0)
+                correct += (predicted == batch_y).sum().item()
+
+        # Average validation loss and accuracy.
+        epoch_loss = total_test_loss / len(test_loader)
+        epoch_accuracy = correct / total
+        test_losses.append(epoch_loss)
+        test_accuracies.append(epoch_accuracy)
+
+        # Save best model.
+        if epoch_accuracy &gt; best_accuracy:
+            best_accuracy = epoch_accuracy
+            best_model_wts = copy.deepcopy(model.state_dict())
+            best_epoch = epoch + 1
+
+        print(
+            f&quot;Epoch {epoch+1}/{epochs}, &quot;
+            f&quot;Training Loss: {train_losses[-1]}, &quot;
+            f&quot;Testing Loss: {test_losses[-1]}, &quot;
+            f&quot;Testing Accuracy: {epoch_accuracy:.4f}&quot;
+        )
+
+    # Restore best validation checkpoint.
+    model.load_state_dict(best_model_wts)
+    print(f&quot;Loaded the best model from epoch {best_epoch} with Testing Accuracy: {best_accuracy:.4f}&quot;)
+
+    # Plot loss and accuracy curves.
+    plt.figure(figsize=(12, 5))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(range(1, epochs+1), train_losses, label='Training Loss')
+    plt.plot(range(1, epochs+1), test_losses, label='Testing Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(range(1, epochs+1), test_accuracies, label='Testing Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+
+    plt.show()
+</code></pre>
+<h3>5.4 How to call that training function</h3>
+<pre><code class="language-python"># Build model, loss, optimizer first.
+model = TabularClassifier(input_dim=Xtr.shape[1], num_classes=num_classes).to(device)
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
+
+# Then train.
+train(
+    model=model,
+    train_loader=train_loader,
+    test_loader=val_loader,
+    optimizer=optimizer,
+    epochs=20,
+    criterion=criterion
+)
+</code></pre>
+<h2>6. PyTorch Optimization Notes</h2>
+<h3>6.1 Correct output / target / loss combinations</h3>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Output</th>
+<th>Target dtype</th>
+<th>Loss</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>regression</td>
+<td>1 float per sample</td>
+<td><code>float32</code></td>
+<td><code>MSELoss</code>, <code>L1Loss</code>, <code>SmoothL1Loss</code></td>
+</tr>
+<tr>
+<td>multiclass classification</td>
+<td><code>num_classes</code> logits</td>
+<td><code>long</code></td>
+<td><code>CrossEntropyLoss</code></td>
+</tr>
+<tr>
+<td>binary classification</td>
+<td>1 logit</td>
+<td><code>float32</code> in <code>{0,1}</code></td>
+<td><code>BCEWithLogitsLoss</code></td>
+</tr>
+</tbody>
+</table>
+<h3>6.2 High-value rules</h3>
+<ul>
+<li>use <code>AdamW</code> first</li>
+<li>try <code>lr=1e-3</code> for small models</li>
+<li>try <code>lr=1e-4</code> when finetuning pretrained backbones</li>
+<li>if loss explodes, lower LR</li>
+<li>if model does not learn, overfit 8 samples</li>
+<li>save the best checkpoint, not just the last epoch</li>
+</ul>
+<h3>6.3 Tiny-batch overfit test</h3>
+<p>If this cannot drive loss very low, your model, labels, or loss setup is wrong.</p>
+<pre><code class="language-python"># Pick 8 training examples only.
+tiny_x = Xtr[:8].to(device)
+tiny_y = ytr[:8].to(device)
+
+for step in range(200):
+    # Forward pass.
+    pred = model(tiny_x)
+
+    # If regression model returns shape (N, 1), remove the last dim.
+    if pred.ndim == 2 and pred.shape[1] == 1:
+        pred = pred.squeeze(-1)
+
+    # Compute loss on the tiny batch.
+    loss = criterion(pred, tiny_y)
+
+    # Standard optimization step order.
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+print(&quot;tiny-batch loss:&quot;, loss.item())
+</code></pre>
+<h3>6.4 DataLoader performance</h3>
+<p>From your local notes:</p>
+<ul>
+<li><code>pin_memory=True</code> helps when you also use <code>non_blocking=True</code></li>
+<li>too many workers can waste RAM</li>
+<li><code>4</code> to <code>8</code> workers is often enough</li>
+</ul>
+<pre><code class="language-python">from torch.utils.data import DataLoader
+
+train_loader = DataLoader(
+    train_ds,
+    batch_size=128,          # medium batch size
+    shuffle=True,            # shuffle training data
+    num_workers=6,           # not too small, not too large
+    pin_memory=True,         # helps faster host-&gt;GPU copies
+    persistent_workers=True  # avoid worker restart every epoch
+)
+
+for xb, yb in train_loader:
+    # non_blocking works best with pin_memory=True.
+    xb = xb.to(device, non_blocking=True)
+    yb = yb.to(device, non_blocking=True)
+</code></pre>
+<h3>6.5 Common PyTorch code errors and how to fix them</h3>
+<h4><code>Expected all tensors to be on the same device</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>your model is on GPU but a batch is on CPU, or the opposite</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">device = &quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;
+model = model.to(device)
+
+for xb, yb in train_loader:
+    xb = xb.to(device, non_blocking=True)
+    yb = yb.to(device, non_blocking=True)
+</code></pre>
+<p>Also remember:</p>
+<ul>
+<li>if you create tensors manually inside training, put them on <code>device</code></li>
+<li>a common mistake is <code>torch.tensor([target_class])</code> without <code>.to(device)</code></li>
+</ul>
+<pre><code class="language-python">target = torch.tensor([target_class], device=device)
+</code></pre>
+<h4><code>Expected scalar type Long but found Float</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>you are using <code>CrossEntropyLoss</code>, but labels are floats</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">ytr = torch.tensor(y_train_np, dtype=torch.long)
+criterion = nn.CrossEntropyLoss()
+</code></pre>
+<p>Rule:</p>
+<ul>
+<li><code>CrossEntropyLoss</code> -&gt; labels must be integer class ids (<code>long</code>)</li>
+<li><code>MSELoss</code> / <code>L1Loss</code> -&gt; targets must usually be <code>float32</code></li>
+</ul>
+<h4><code>Expected input batch_size to match target batch_size</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>output shape and target shape do not line up</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">print(&quot;pred shape:&quot;, pred.shape)
+print(&quot;target shape:&quot;, yb.shape)
+</code></pre>
+<p>Typical expected shapes:</p>
+<ul>
+<li>classification:</li>
+<li><code>pred</code>: <code>(batch_size, num_classes)</code></li>
+<li><code>yb</code>: <code>(batch_size,)</code></li>
+<li>regression:</li>
+<li><code>pred</code>: <code>(batch_size, 1)</code> or <code>(batch_size,)</code></li>
+<li><code>yb</code>: <code>(batch_size,)</code></li>
+</ul>
+<pre><code class="language-python">pred = model(xb)
+pred = pred.squeeze(-1)   # only for regression if shape is (N, 1)
+loss = criterion(pred, yb)
+</code></pre>
+<h4><code>mat1 and mat2 shapes cannot be multiplied</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>your <code>Linear</code> layer input size is wrong</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">print(x.shape)
+</code></pre>
+<p>Most common conv-net fix:</p>
+<pre><code class="language-python">x = x.view(x.size(0), -1)
+</code></pre>
+<p>Best habit:</p>
+<ul>
+<li>print tensor shapes inside <code>forward()</code> while debugging</li>
+<li>verify that <code>nn.Linear(in_features=...)</code> matches the flattened tensor</li>
+</ul>
+<h4><code>RuntimeError: stack expects each tensor to be equal size</code></h4>
+<p>Example:</p>
+<pre><code class="language-python">RuntimeError: stack expects each tensor to be equal size,
+but got [10000, 3] at entry 0 and [10000, 2] at entry 1
+</code></pre>
+<p>Meaning:</p>
+<ul>
+<li>you used <code>torch.stack(...)</code> on tensors with different shapes</li>
+<li><code>stack</code> adds a new dimension, so every input tensor must already have the exact same shape</li>
+</ul>
+<p>Why this happens:</p>
+<ul>
+<li>two feature blocks have different numbers of columns</li>
+<li>predictions from different models have different class counts</li>
+<li>one tensor is missing a column / channel / time step</li>
+<li>variable-length sequences were not padded first</li>
+</ul>
+<p>Wrong:</p>
+<pre><code class="language-python">a = torch.randn(10000, 3)
+b = torch.randn(10000, 2)
+x = torch.stack([a, b])   # crash
+</code></pre>
+<p>Fix 1: if you wanted to combine features side-by-side, use <code>torch.cat(..., dim=1)</code></p>
+<pre><code class="language-python">a = torch.randn(10000, 3)
+b = torch.randn(10000, 2)
+
+# Result shape: (10000, 5)
+x = torch.cat([a, b], dim=1)
+</code></pre>
+<p>Fix 2: if you really need <code>stack</code>, first make shapes equal</p>
+<pre><code class="language-python">a = torch.randn(10000, 3)
+b = torch.randn(10000, 3)
+
+# Result shape: (2, 10000, 3)
+x = torch.stack([a, b], dim=0)
+</code></pre>
+<p>Fix 3: print shapes before stacking</p>
+<pre><code class="language-python">print(a.shape)
+print(b.shape)
+</code></pre>
+<p>Rule:</p>
+<ul>
+<li><code>torch.stack([a, b])</code> requires <code>a.shape == b.shape</code></li>
+<li><code>torch.cat([a, b], dim=k)</code> requires same shape on all dimensions except <code>dim=k</code></li>
+</ul>
+<p>Common contest cases:</p>
+<ul>
+<li>combining embeddings from different sources</li>
+<li>combining logits from models with different class counts</li>
+<li>collecting variable-length sequences without padding</li>
+<li>stacking image tensors that were resized differently</li>
+</ul>
+<p>Square-painting generalization:</p>
+<ul>
+<li>this also happens when one tensor is the <strong>input</strong> and the other is the <strong>target</strong></li>
+<li>for example, coordinates may have shape <code>(N, 2)</code> while RGB targets have shape <code>(N, 3)</code></li>
+<li>those are different roles, not two copies of the same kind of tensor</li>
+</ul>
+<p>Wrong pattern:</p>
+<pre><code class="language-python"># inputs: x,y coordinates
+inputs.shape == (N, 2)
+
+# targets: r,g,b values
+targets.shape == (N, 3)
+
+bad = torch.stack([inputs, targets])   # wrong
+</code></pre>
+<p>Why it is wrong:</p>
+<ul>
+<li><code>stack</code> means "same tensor shape, add a new axis"</li>
+<li>but <code>(N, 2)</code> and <code>(N, 3)</code> are not the same shape</li>
+<li>semantically they should stay separate as <code>(x, y)</code> in supervised learning</li>
+</ul>
+<p>Correct supervised-learning pattern:</p>
+<pre><code class="language-python">from torch.utils.data import TensorDataset, DataLoader
+
+# Keep inputs and targets separate.
+dataset = TensorDataset(inputs, targets)
+loader = DataLoader(dataset, batch_size=64, shuffle=True)
+
+for batch_x, batch_y in loader:
+    pred = model(batch_x)
+    loss = criterion(pred, batch_y)
+</code></pre>
+<p>If you really mean to build one combined feature matrix, use <code>cat</code>, not <code>stack</code>:</p>
+<pre><code class="language-python"># Only if combining into one feature table actually makes sense.
+xy_rgb = torch.cat([inputs, targets], dim=1)   # shape (N, 5)
+</code></pre>
+<p>Competition rule:</p>
+<ul>
+<li>different roles -&gt; keep separate</li>
+<li>same role, different feature blocks -&gt; usually <code>cat</code></li>
+<li>new axis over equal-shaped tensors -&gt; <code>stack</code></li>
+</ul>
+<h4><code>CUDA out of memory</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>your batch, model, or image size is too large for the GPU</li>
+</ul>
+<p>Fixes:</p>
+<ul>
+<li>reduce <code>batch_size</code></li>
+<li>reduce input resolution</li>
+<li>use a smaller model</li>
+<li>avoid storing unnecessary tensors</li>
+<li>use <code>torch.no_grad()</code> in validation</li>
+</ul>
+<pre><code class="language-python">batch_size = 32   # try 128 -&gt; 64 -&gt; 32 -&gt; 16
+</code></pre>
+<h4>Loss becomes <code>nan</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>unstable optimization, bad preprocessing, or invalid values</li>
+</ul>
+<p>Fixes:</p>
+<ul>
+<li>lower learning rate</li>
+<li>check for NaNs in inputs and labels</li>
+<li>normalize inputs</li>
+<li>clip gradients</li>
+</ul>
+<pre><code class="language-python">print(torch.isnan(xb).any())
+print(torch.isnan(yb).any())
+
+torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+</code></pre>
+<h4>Accuracy stays near random chance</h4>
+<p>Meaning:</p>
+<ul>
+<li>the task/loss/labels are mismatched, or the model is not learning</li>
+</ul>
+<p>Fixes:</p>
+<ul>
+<li>overfit 8 samples</li>
+<li>verify class balance</li>
+<li>verify optimizer order</li>
+<li>verify you are not applying <code>softmax</code> before <code>CrossEntropyLoss</code></li>
+</ul>
+<p>Wrong:</p>
+<pre><code class="language-python">probs = torch.softmax(model(xb), dim=1)
+loss = nn.CrossEntropyLoss()(probs, yb)
+</code></pre>
+<p>Correct:</p>
+<pre><code class="language-python">logits = model(xb)
+loss = nn.CrossEntropyLoss()(logits, yb)
+</code></pre>
+<h4>Regression problem but classification code was reused</h4>
+<p>Meaning:</p>
+<ul>
+<li>you copied a classification loop into a regression task</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">criterion = nn.MSELoss()
+ytr = torch.tensor(y_train_np, dtype=torch.float32)
+pred = model(xb).squeeze(-1)
+loss = criterion(pred, yb)
+</code></pre>
+<p>Rule:</p>
+<ul>
+<li>regression = float targets + regression loss</li>
+<li>classification = integer targets + classification loss</li>
+</ul>
+<h4><code>Trying to backward through the graph a second time</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>you reused a tensor with graph history from a previous step</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">x = x.detach()
+</code></pre>
+<p>Common cases:</p>
+<ul>
+<li>adversarial attacks</li>
+<li>iterative input optimization</li>
+<li>reusing model outputs later without detaching</li>
+</ul>
+<h4>In-place operation error</h4>
+<p>Meaning:</p>
+<ul>
+<li>you modified a tensor that autograd still needed</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">x_tmp = x.clone().detach()
+# modify x_tmp instead of x directly
+</code></pre>
+<p>Common cases:</p>
+<ul>
+<li>manual image attacks</li>
+<li>direct optimization on tensors</li>
+<li>custom training logic with partial updates</li>
+</ul>
+<h4>Validation behaves strangely because Dropout / BatchNorm are wrong</h4>
+<p>Meaning:</p>
+<ul>
+<li>you forgot to switch between training and evaluation modes</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">model.train()   # training
+model.eval()    # validation / inference
+</code></pre>
+<p>Always combine evaluation with:</p>
+<pre><code class="language-python">with torch.no_grad():
+    ...
+</code></pre>
+<h4>Best quick PyTorch debug print block</h4>
+<pre><code class="language-python">print(&quot;xb:&quot;, xb.shape, xb.dtype, xb.device)
+print(&quot;yb:&quot;, yb.shape, yb.dtype, yb.device)
+pred = model(xb)
+print(&quot;pred:&quot;, pred.shape, pred.dtype, pred.device)
+print(&quot;pred sample:&quot;, pred[:2])
+print(&quot;target sample:&quot;, yb[:10])
+</code></pre>
+<h3>6.6 More PyTorch errors you may hit</h3>
+<h4><code>Target 7 is out of bounds</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>your labels contain a class id outside <code>[0, num_classes - 1]</code></li>
+<li>common when labels start at <code>1</code> instead of <code>0</code></li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">print(ytr.min().item(), ytr.max().item())
+
+# Example: labels were 1..K, convert them to 0..K-1.
+ytr = ytr - 1
+yva = yva - 1
+
+# Final layer must output one logit per class.
+model.fc = nn.Linear(model.fc.in_features, num_classes)
+</code></pre>
+<h4><code>Using a target size ... different to the input size ...</code> with <code>BCEWithLogitsLoss</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>binary-classification logits and targets do not have matching shapes</li>
+</ul>
+<p>Correct pattern:</p>
+<pre><code class="language-python"># One logit per sample.
+logits = model(xb).squeeze(1)
+
+# BCE targets must be float 0/1, not long class ids.
+yb = yb.float()
+
+loss = nn.BCEWithLogitsLoss()(logits, yb)
+</code></pre>
+<p>Rule:</p>
+<ul>
+<li>binary classification with one output neuron -&gt; <code>BCEWithLogitsLoss</code></li>
+<li>multiclass classification with <code>C</code> outputs -&gt; <code>CrossEntropyLoss</code></li>
+</ul>
+<h4><code>view size is not compatible with input tensor's size and stride</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>you tried <code>.view(...)</code> on a non-contiguous tensor</li>
+<li>common after <code>transpose</code>, <code>permute</code>, or slicing</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python"># reshape() is safer when tensor memory is not contiguous.
+x = x.reshape(x.size(0), -1)
+</code></pre>
+<p>Alternative:</p>
+<pre><code class="language-python">x = x.contiguous().view(x.size(0), -1)
+</code></pre>
+<h4><code>Can't call numpy() on Tensor that requires grad</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>you tried to convert a tensor to NumPy before detaching it from autograd</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">arr = pred.detach().cpu().numpy()
+</code></pre>
+<p>Rule:</p>
+<ul>
+<li>plotting / saving / scikit-learn use -&gt; <code>tensor.detach().cpu().numpy()</code></li>
+</ul>
+<h4><code>DataLoader worker (pid ...) exited unexpectedly</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>worker subprocesses crashed</li>
+<li>on Windows this often comes from notebook multiprocessing issues</li>
+</ul>
+<p>Fast fix:</p>
+<pre><code class="language-python"># First make it work. Then increase workers again if needed.
+train_loader = DataLoader(train_ds, batch_size=128, shuffle=True, num_workers=0)
+</code></pre>
+<p>Then check:</p>
+<ul>
+<li>dataset <code>__getitem__</code> does not crash</li>
+<li>images/files actually exist</li>
+<li>batch creation does not use unsupported objects</li>
+<li>only raise <code>num_workers</code> after the single-process loader works</li>
+</ul>
+<h4><code>element 0 of tensors does not require grad and does not have a grad_fn</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>you broke the graph before <code>backward()</code></li>
+</ul>
+<p>Common causes:</p>
+<ul>
+<li>calling <code>.detach()</code> too early</li>
+<li>converting to NumPy in the middle of training</li>
+<li>wrapping a tensor with <code>torch.tensor(existing_tensor)</code> instead of using it directly</li>
+</ul>
+<p>Wrong:</p>
+<pre><code class="language-python">pred = model(xb).detach()
+loss = criterion(pred, yb)
+loss.backward()   # crash
+</code></pre>
+<p>Correct:</p>
+<pre><code class="language-python">pred = model(xb)
+loss = criterion(pred, yb)
+loss.backward()
+</code></pre>
+<h2>7. PyTorch Computer Vision</h2>
+<h3>7.1 Preprocessing</h3>
+<pre><code class="language-python">from torchvision import transforms as T
+
+train_tf = T.Compose([
+    # Random crop introduces small geometric variety.
+    T.RandomResizedCrop(224),
+    # Horizontal flip is useful for many natural image tasks.
+    T.RandomHorizontalFlip(),
+    # Mild color jitter helps robustness.
+    T.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.05),
+    # Convert PIL image to tensor in [0, 1].
+    T.ToTensor(),
+    # ImageNet normalization for pretrained backbones.
+    T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+])
+
+val_tf = T.Compose([
+    # Deterministic validation pipeline.
+    T.Resize(256),
+    T.CenterCrop(224),
+    T.ToTensor(),
+    T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+])
+</code></pre>
+<h3>7.2 Transfer learning baseline</h3>
+<p>Best default for small image datasets.</p>
+<pre><code class="language-python">import torch
+import torch.nn as nn
+from torchvision import models
+
+# Load pretrained ResNet18 weights.
+model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+
+# Freeze all backbone weights first.
+for p in model.parameters():
+    p.requires_grad = False
+
+# Replace the classifier head with one that matches your classes.
+model.fc = nn.Linear(model.fc.in_features, num_classes)
+model = model.to(device)
+
+# Train only the new head first.
+optimizer = torch.optim.AdamW(model.fc.parameters(), lr=1e-3, weight_decay=1e-4)
+criterion = nn.CrossEntropyLoss()
+</code></pre>
+<p>Later improvements if time allows:</p>
+<ul>
+<li>unfreeze last residual block</li>
+<li>lower LR to <code>1e-4</code></li>
+<li>continue training for a few epochs</li>
+</ul>
+<h3>7.3 Simple CNN with <code>nn.Module</code></h3>
+<p>Use when pretrained ImageNet features do not fit the domain or when the task is intentionally small/simple.</p>
+<pre><code class="language-python">import torch
+import torch.nn as nn
+
+class SmallCNN(nn.Module):
+    def __init__(self, n_cls):
+        super(SmallCNN, self).__init__()
+
+        # First conv block: learn low-level edges and textures.
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
+
+        # Second conv block: learn more abstract patterns.
+        self.conv3 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.conv4 = nn.Conv2d(64, 64, kernel_size=3, padding=1)
+
+        # Pooling reduces spatial size and computation.
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        # Adaptive pooling makes the model robust to final feature-map size.
+        self.gap = nn.AdaptiveAvgPool2d(1)
+
+        # Fully connected classifier head.
+        self.fc1 = nn.Linear(64, 128)
+        self.fc2 = nn.Linear(128, n_cls)
+
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(0.3)
+
+    def forward(self, x):
+        # Block 1.
+        x = self.conv1(x)
+        x = self.relu(x)
+        x = self.conv2(x)
+        x = self.relu(x)
+        x = self.pool(x)
+
+        # Block 2.
+        x = self.conv3(x)
+        x = self.relu(x)
+        x = self.conv4(x)
+        x = self.relu(x)
+        x = self.pool(x)
+
+        # Global average pooling -&gt; shape becomes (N, 64, 1, 1).
+        x = self.gap(x)
+
+        # Flatten to (N, 64).
+        x = x.view(x.size(0), -1)
+
+        # Classifier head.
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.fc2(x)
+
+        # Raw logits out.
+        return x
+</code></pre>
+<h3>7.4 Vision reminders</h3>
+<ul>
+<li>PIL / NumPy image shape: <code>(H, W, C)</code></li>
+<li>PyTorch image shape: <code>(C, H, W)</code></li>
+<li>PyTorch batch shape: <code>(N, C, H, W)</code></li>
+<li>OpenCV loads color images in <strong>BGR</strong>, not RGB</li>
+<li>for tiny image datasets, augmentation often matters more than a bigger model</li>
+</ul>
+<h3>7.5 Vision-specific failure patterns</h3>
+<h4><code>expected input to have 3 channels, but got 1 channels instead</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>the backbone expects RGB input but your data is grayscale</li>
+</ul>
+<p>Fix options:</p>
+<ul>
+<li>convert grayscale images to 3 channels during preprocessing</li>
+<li>or change the first conv layer if the architecture is allowed</li>
+</ul>
+<pre><code class="language-python"># Repeat one grayscale channel into fake RGB.
+x = x.repeat(1, 3, 1, 1)
+</code></pre>
+<h4>Images look correct to you, but training is terrible</h4>
+<p>Common causes:</p>
+<ul>
+<li>you forgot ImageNet normalization for pretrained backbones</li>
+<li>train and validation transforms are inconsistent</li>
+<li>labels from folder names were mapped in the wrong order</li>
+</ul>
+<p>Quick checks:</p>
+<pre><code class="language-python">print(train_ds.class_to_idx)
+print(xb.shape, xb.min().item(), xb.max().item())
+</code></pre>
+<h4><code>mat1 and mat2 shapes cannot be multiplied</code> after a conv stack</h4>
+<p>Meaning:</p>
+<ul>
+<li>the flattened tensor does not match the first linear layer</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python"># Print the tensor shape right before flattening.
+print(x.shape)
+x = x.reshape(x.size(0), -1)
+</code></pre>
+<h2>8. Embeddings and Text</h2>
+<h3>8.1 Embeddings already given</h3>
+<p>Treat embeddings like normal dense numeric features.</p>
+<pre><code class="language-python">import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+# Load embedding matrix and labels.
+X = np.load(&quot;train_embeddings.npy&quot;)
+y = np.load(&quot;train_labels.npy&quot;)
+
+# Train/validation split first.
+X_train, X_val, y_train, y_val = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Logistic regression is a very strong cheap baseline on embeddings.
+clf = LogisticRegression(max_iter=2000, n_jobs=-1)
+clf.fit(X_train, y_train)
+
+pred = clf.predict(X_val)
+print(&quot;acc:&quot;, accuracy_score(y_val, pred))
+</code></pre>
+<pre><code class="language-python">from xgboost import XGBRegressor
+
+# For embedding regression tasks, boosting is usually strong.
+reg = XGBRegressor(
+    n_estimators=500,
+    max_depth=6,
+    learning_rate=0.05,
+    random_state=42
+)
+
+reg.fit(X_train, y_train)
+pred = reg.predict(X_val)
+</code></pre>
+<h3>8.2 Cosine similarity retrieval</h3>
+<pre><code class="language-python">import numpy as np
+
+def l2norm(x):
+    # Normalize rows to unit length so cosine similarity becomes dot product.
+    return x / (np.linalg.norm(x, axis=1, keepdims=True) + 1e-9)
+
+# Normalize corpus/document embeddings.
+doc_emb = l2norm(doc_emb)
+
+# Normalize query embedding too.
+q_emb = l2norm(q_emb.reshape(1, -1))[0]
+
+# Cosine similarities because all vectors are unit-normalized.
+sims = doc_emb @ q_emb
+
+# Top indices with highest similarity.
+topk = np.argsort(-sims)[:10]
+</code></pre>
+<h3>8.3 TF-IDF + LogisticRegression</h3>
+<p>This should usually be your first text baseline.</p>
+<pre><code class="language-python">from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from scipy.sparse import hstack
+
+# Word n-grams capture normal word patterns.
+vec_word = TfidfVectorizer(
+    ngram_range=(1, 2),
+    min_df=3,
+    max_df=0.95,
+    sublinear_tf=True,
+    max_features=200_000,
+)
+
+# Character n-grams are very useful for noisy text, spelling variation, and Greeklish.
+vec_char = TfidfVectorizer(
+    analyzer=&quot;char_wb&quot;,
+    ngram_range=(3, 5),
+    min_df=3,
+)
+
+# Fit on training text only.
+Xw_tr = vec_word.fit_transform(train_texts)
+Xw_va = vec_word.transform(val_texts)
+
+Xc_tr = vec_char.fit_transform(train_texts)
+Xc_va = vec_char.transform(val_texts)
+
+# Combine word and character features.
+Xtr = hstack([Xw_tr, Xc_tr]).tocsr()
+Xva = hstack([Xw_va, Xc_va]).tocsr()
+
+# Logistic regression is a strong sparse-text baseline.
+clf = LogisticRegression(
+    max_iter=2000,
+    class_weight=&quot;balanced&quot;,
+    n_jobs=-1
+)
+
+clf.fit(Xtr, y_train)
+pred = clf.predict(Xva)
+</code></pre>
+<h3>8.4 <code>nn.Embedding</code></h3>
+<pre><code class="language-python">import torch
+import torch.nn as nn
+
+# vocab_size = number of token ids
+# embedding_dim = vector size per token
+embed = nn.Embedding(num_embeddings=vocab_size, embedding_dim=128)
+
+# Each integer is a token id.
+token_ids = torch.tensor([
+    [1, 4, 7],
+    [2, 9, 0]
+])
+
+# Output shape: (batch, seq_len, embedding_dim)
+out = embed(token_ids)
+print(out.shape)
+</code></pre>
+<h3>8.5 Offline warning</h3>
+<ul>
+<li>do not assume you can download Hugging Face models</li>
+<li>use pretrained models only if weights are already available locally</li>
+<li>if not sure, use TF-IDF or provided embeddings first</li>
+</ul>
+<h3>8.6 Text / embedding failure patterns</h3>
+<h4>Text model validation is suspiciously too good</h4>
+<p>Common cause:</p>
+<ul>
+<li><code>TfidfVectorizer</code> or tokenizer was fit on the full dataset before the split</li>
+</ul>
+<p>Rule:</p>
+<ul>
+<li>split first</li>
+<li>fit vectorizer on train only</li>
+<li>transform validation/test with the fitted train vectorizer</li>
+</ul>
+<h4>Sparse text pipeline suddenly uses huge RAM</h4>
+<p>Common cause:</p>
+<ul>
+<li>converting sparse TF-IDF matrices to dense arrays</li>
+</ul>
+<p>Avoid:</p>
+<pre><code class="language-python">X_dense = X_tfidf.toarray()   # often unnecessary and expensive
+</code></pre>
+<p>Prefer:</p>
+<ul>
+<li>models that accept sparse input directly, such as <code>LogisticRegression</code>, <code>LinearSVC</code>, <code>SGDClassifier</code></li>
+</ul>
+<h4>Retrieval results look wrong although shapes are fine</h4>
+<p>Common cause:</p>
+<ul>
+<li>cosine similarity was used without normalizing embeddings</li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">E = E / np.linalg.norm(E, axis=1, keepdims=True)
+q = q / np.linalg.norm(q)
+scores = E @ q
+</code></pre>
+<h4><code>IndexError: index out of range in self</code> with <code>nn.Embedding</code></h4>
+<p>Meaning:</p>
+<ul>
+<li>some token id is <code>&gt;= vocab_size</code></li>
+</ul>
+<p>Fix:</p>
+<pre><code class="language-python">print(tokens.min().item(), tokens.max().item())
+embedding = nn.Embedding(vocab_size, embedding_dim)
+</code></pre>
+<h2>9. Optimization / Solver Problems</h2>
+<p>If the problem is discrete and constraint-heavy, think solver before ML.</p>
+<h3>9.1 PuLP assignment example</h3>
+<pre><code class="language-python">import pulp
+
+N, M = 5, 3
+cost = [
+    [4, 2, 8],
+    [1, 9, 3],
+    [5, 4, 6],
+    [7, 2, 3],
+    [2, 8, 1]
+]
+
+# Minimize total assignment cost.
+prob = pulp.LpProblem(&quot;assignment&quot;, pulp.LpMinimize)
+
+# Binary variable x[i][j] = 1 if item i goes to slot j.
+x = [[pulp.LpVariable(f&quot;x_{i}_{j}&quot;, cat=&quot;Binary&quot;) for j in range(M)] for i in range(N)]
+
+# Objective.
+prob += pulp.lpSum(cost[i][j] * x[i][j] for i in range(N) for j in range(M))
+
+# Each item must be assigned exactly once.
+for i in range(N):
+    prob += pulp.lpSum(x[i][j] for j in range(M)) == 1
+
+# Each slot has capacity &lt;= 2.
+for j in range(M):
+    prob += pulp.lpSum(x[i][j] for i in range(N)) &lt;= 2
+
+# Solve silently.
+prob.solve(pulp.PULP_CBC_CMD(msg=False))
+</code></pre>
+<h3>9.2 OR-Tools CP-SAT skeleton</h3>
+<pre><code class="language-python">from ortools.sat.python import cp_model
+
+# Create a CP-SAT model.
+model = cp_model.CpModel()
+
+# Add variables and constraints here.
+
+# Create solver.
+solver = cp_model.CpSolver()
+solver.parameters.max_time_in_seconds = 10
+
+# Solve.
+status = solver.Solve(model)
+</code></pre>
+<h2>10. Debugging Checklist</h2>
+<h3>10.1 Find the broken stage first</h3>
+<p>Do not debug everything at once. First identify the failing stage:</p>
+<ul>
+<li>load: files missing, wrong paths, wrong CSV separator, image decode fails</li>
+<li>split: train/validation misaligned, class missing in one split, leakage</li>
+<li>features: NaNs, raw strings, unseen categories, wrong normalization</li>
+<li>model input: wrong tensor shape, wrong dtype, wrong device</li>
+<li>training: loss does not fall, gradients break, LR too high, OOM</li>
+<li>validation: <code>model.eval()</code> missing, wrong metric, shuffled labels</li>
+<li>export/submission: wrong column names, wrong file name, wrong JSON/CSV format</li>
+</ul>
+<h3>10.2 60-second debug routine</h3>
+<p>When the model is broken:</p>
+<ol>
+<li>print shapes and dtypes</li>
+<li>print 3 raw samples and 3 targets</li>
+<li>verify the metric and required submission format</li>
+<li>verify train/validation split and target balance</li>
+<li>run the cheapest baseline</li>
+<li>overfit a tiny batch</li>
+<li>move LR by <code>x10</code> and <code>/10</code></li>
+<li>inspect one prediction manually</li>
+</ol>
+<h3>10.3 Useful prints</h3>
+<pre><code class="language-python"># Table / NumPy sanity.
+print(X.shape, y.shape)
+print(type(X), type(y))
+print(X.dtype, y.dtype)
+
+# Raw examples reveal parsing bugs fast.
+print(df.head())
+
+# Target balance matters for both splits and metric choice.
+print(np.unique(y, return_counts=True))
+</code></pre>
+<pre><code class="language-python"># PyTorch sanity block.
+print(&quot;xb:&quot;, xb.shape, xb.dtype, xb.device)
+print(&quot;yb:&quot;, yb.shape, yb.dtype, yb.device)
+pred = model(xb)
+print(&quot;pred:&quot;, pred.shape, pred.dtype, pred.device)
+print(&quot;pred sample:&quot;, pred[:2])
+print(&quot;target sample:&quot;, yb[:10])
+</code></pre>
+<h3>10.4 Common failures by segment</h3>
+<h4>Data loading</h4>
+<ul>
+<li>file exists but you are in the wrong working directory</li>
+<li>CSV delimiter is not <code>,</code></li>
+<li>image paths are relative to a different folder</li>
+<li>labels were read as strings with spaces</li>
+</ul>
+<p>Quick checks:</p>
+<pre><code class="language-python">print(df.shape)
+print(df.columns.tolist())
+print(df.dtypes)
+</code></pre>
+<h4>Split / leakage</h4>
+<ul>
+<li>scaling, PCA, TF-IDF, or imputation fit on full data instead of train only</li>
+<li>duplicates from train leaking into validation</li>
+<li>target accidentally left inside features</li>
+</ul>
+<p>Quick checks:</p>
+<pre><code class="language-python">print(&quot;target in X:&quot;, &quot;target&quot; in X.columns)
+print(&quot;train rows:&quot;, len(X_train), &quot;val rows:&quot;, len(X_val))
+</code></pre>
+<h4>Modeling</h4>
+<ul>
+<li>classifier used for regression</li>
+<li>regression loss used with integer class labels</li>
+<li><code>softmax</code> added before <code>CrossEntropyLoss</code></li>
+<li>binary task coded as multiclass or the reverse</li>
+</ul>
+<h4>Optimization</h4>
+<ul>
+<li>LR too high -&gt; loss becomes <code>nan</code> or explodes</li>
+<li>LR too low -&gt; loss barely changes</li>
+<li>batch too large -&gt; OOM</li>
+<li>no tiny-batch overfit -&gt; setup bug likely remains</li>
+</ul>
+<h4>Submission / export</h4>
+<ul>
+<li>row order changed</li>
+<li>id column missing</li>
+<li>probabilities required, but class ids submitted</li>
+<li>one file or level missing from exported JSON</li>
+</ul>
+<p>Quick checks:</p>
+<pre><code class="language-python">print(submission.head())
+print(submission.shape)
+print(submission.columns.tolist())
+</code></pre>
+<h3>10.5 Mandatory optimizer order</h3>
+<pre><code class="language-python"># Clear old gradients first.
+optimizer.zero_grad()
+
+# Compute gradients.
+loss.backward()
+
+# Apply one optimization step.
+optimizer.step()
+</code></pre>
+<h3>10.6 Submission / export sanity block</h3>
+<pre><code class="language-python"># Use right before final write.
+print(&quot;rows:&quot;, len(submission))
+print(&quot;columns:&quot;, submission.columns.tolist())
+print(submission.head(3))
+
+# For JSON answers, also inspect one entry manually.
+print(list(result.keys())[:3])
+</code></pre>
+<h2>11. Worked Problems From This Repo</h2>
+<p>These are not just references. They are solved patterns you can reuse.</p>
+<h3>11.1 <code>emotions.ipynb</code>: sparse adversarial attack on emotion classifier</h3>
+<p>Problem pattern:</p>
+<ul>
+<li>input is a grayscale <code>112 x 112</code> face image</li>
+<li>model is fixed</li>
+<li>goal is to change the predicted emotion with very small <code>L1</code> pixel edits</li>
+</ul>
+<p>What the notebook does:</p>
+<ul>
+<li>loads a pretrained grayscale-adapted <code>ShuffleNet</code></li>
+<li>wraps preprocessing inside the model</li>
+<li>uses gradients with respect to the image</li>
+<li>changes only the highest-impact pixels</li>
+<li>moves each chosen pixel by only <code>+1</code> or <code>-1</code></li>
+<li>clamps pixels into <code>[0, 255]</code></li>
+</ul>
+<p>Key idea:</p>
+<ul>
+<li>do <strong>not</strong> optimize all pixels with large continuous changes</li>
+<li>instead, rank pixels by <code>abs(gradient)</code> and edit only a few each step</li>
+</ul>
+<p>Important pattern:</p>
+<pre><code class="language-python"># Gradient-based sparse pixel attack:
+# 1. compute loss toward target class
+# 2. backprop into the image
+# 3. sort pixels by gradient magnitude
+# 4. change only the top few pixels by +/-1
+
+output = model(adv.clamp(0, 255))
+loss = F.cross_entropy(output, torch.tensor([target_class]))
+model.zero_grad()
+loss.backward()
+
+grad = adv.grad.detach()
+indices = torch.argsort(grad.view(-1).abs(), descending=True)
+</code></pre>
+<p>What to remember:</p>
+<ul>
+<li><code>targeted</code> attack: push image toward a chosen target class</li>
+<li><code>untargeted</code> attack: push image away from the original class</li>
+<li>use <code>.clone().detach()</code> often to avoid autograd mistakes</li>
+<li>compare images after <code>.round()</code> because submission is integer-valued</li>
+</ul>
+<h3>11.2 <code>challenges/nextmovie.ipynb</code>: ranking by optimized query embedding</h3>
+<p>Problem pattern:</p>
+<ul>
+<li>you are given movie embeddings</li>
+<li>you must produce one query vector so that movies rank in a required order</li>
+</ul>
+<p>Cheap solution:</p>
+<ul>
+<li>build the query as a weighted sum of the target embeddings</li>
+<li>subtract the mean embedding of non-target movies</li>
+<li>normalize the final query</li>
+</ul>
+<pre><code class="language-python"># Target movie embeddings.
+T = E[targets]
+
+# Non-target embeddings.
+others = E[[i for i in range(len(E)) if i not in targets]]
+
+# Larger weights for earlier desired ranks.
+weights = torch.tensor([32., 16., 8., 4., 2.])
+
+# Pull target movies closer.
+emb = (weights[:, None] * T).sum(dim=0)
+
+# Push the rest away.
+emb = emb - 4 * others.mean(dim=0)
+
+# Normalize for cosine similarity.
+emb = emb / emb.norm()
+</code></pre>
+<p>Better solution from the notebook:</p>
+<ul>
+<li>optimize the query vector directly with <code>Adam</code></li>
+<li>define loss terms that force:</li>
+<li><code>target1 &gt; target2 &gt; ... &gt; target5</code></li>
+<li>all targets &gt; all non-targets</li>
+<li>use cosine similarity and exponential hinge-like penalties</li>
+</ul>
+<p>What to remember:</p>
+<ul>
+<li>ranking tasks on embeddings often reduce to <strong>query vector design</strong></li>
+<li>normalization is critical</li>
+<li>weighted sums are a strong baseline</li>
+<li>direct optimization over the query is often enough; you do not need to retrain a model</li>
+</ul>
+<h3>11.3 <code>challenges/captcha.ipynb</code>: solve arithmetic CAPTCHA by segmenting and classifying digits</h3>
+<p>Problem pattern:</p>
+<ul>
+<li>one image contains <code>digit digit operator digit digit</code></li>
+<li>output is the computed arithmetic result</li>
+</ul>
+<p>The notebook solution:</p>
+<ul>
+<li>train MNIST digit classifiers first</li>
+<li>train one classifier on clean MNIST</li>
+<li>train another classifier on noisy/augmented MNIST</li>
+<li>split the CAPTCHA image into 5 fixed <code>28x28</code> slices</li>
+<li>classify each digit slice independently</li>
+<li>detect operator with a cheap heuristic instead of training another model</li>
+</ul>
+<p>Digit model used:</p>
+<pre><code class="language-python">class ConvNet(nn.Module):
+    def __init__(self):
+        super(ConvNet, self).__init__()
+        self.conv1 = nn.Conv2d(1, 10, kernel_size=5)
+        self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
+        self.fc1 = nn.Linear(320, 50)
+        self.fc2 = nn.Linear(50, 10)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.relu(x)
+        x = F.max_pool2d(x, 2)
+        x = self.conv2(x)
+        x = self.relu(x)
+        x = F.max_pool2d(x, 2)
+        x = x.view(-1, 320)
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
+</code></pre>
+<p>Image splitting pattern:</p>
+<pre><code class="language-python"># Full CAPTCHA has shape roughly (1, 28, 140).
+# Split across width into 5 pieces of width 28.
+digit1 = eq[:, :, :, 0:28]
+digit2 = eq[:, :, :, 28:56]
+op     = eq[:, :, :, 56:84]
+digit3 = eq[:, :, :, 84:112]
+digit4 = eq[:, :, :, 112:140]
+</code></pre>
+<p>Operator trick:</p>
+<ul>
+<li><code>+</code> has a vertical stroke</li>
+<li><code>-</code> mostly does not</li>
+<li>the notebook uses pixel sums in a central vertical strip to distinguish them</li>
+</ul>
+<p>Noise trick:</p>
+<ul>
+<li>for noisy CAPTCHAs, it applies largest-connected-component extraction</li>
+<li>this removes isolated noise while keeping the main digit structure</li>
+</ul>
+<p>What to remember:</p>
+<ul>
+<li>if positions are fixed, segmentation can be a simple slice, not a detector</li>
+<li>if only one symbol differs structurally, a heuristic may beat training another model</li>
+<li>train on noisy augmentations if the test data is noisy</li>
+</ul>
+<h3>11.4 <code>pdtn2025/deepfakes_final.ipynb</code>: binary image classification with a required backbone</h3>
+<p>Problem pattern:</p>
+<ul>
+<li>image classification</li>
+<li>architecture may be constrained</li>
+<li>dataset is split into train / validation folders</li>
+</ul>
+<p>What the notebook does:</p>
+<ul>
+<li>uses <code>ImageFolder</code>-style dataset setup</li>
+<li>normalizes images with ImageNet statistics</li>
+<li>uses <code>torchvision.models.shufflenet_v2_x1_0</code></li>
+<li>swaps the last classifier layer to <code>2</code> outputs</li>
+<li>optionally loads ImageNet pretrained weights</li>
+<li>trains with <code>Adam</code>, low learning rate, and validation tracking</li>
+</ul>
+<p>Important pattern:</p>
+<pre><code class="language-python"># Load the required backbone. Pretrained weights are the strongest cheap start.
+model = models.shufflenet_v2_x1_0(
+    weights=models.ShuffleNet_V2_X1_0_Weights.IMAGENET1K_V1
+)
+
+# Replace only the final classifier so logits match the two contest classes.
+model.fc = torch.nn.Linear(model.fc.in_features, 2)
+
+# Small LR because the pretrained backbone already knows useful visual features.
+optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
+</code></pre>
+<p>What to remember:</p>
+<ul>
+<li>when the architecture is fixed, the main gains come from:</li>
+<li>pretrained initialization</li>
+<li>correct transforms</li>
+<li>optimizer / LR choice</li>
+<li>enough validation monitoring</li>
+</ul>
+<h3>11.5 <code>pdtn2025/Αντίγραφο_embeddings_greedy_torch (1).ipynb</code>: word-chain search on embeddings</h3>
+<p>Problem pattern:</p>
+<ul>
+<li>words are nodes</li>
+<li>cosine similarity defines closeness</li>
+<li>you need a chain from one word to another</li>
+</ul>
+<p>What the notebook does:</p>
+<ul>
+<li>reads embeddings</li>
+<li>L2-normalizes them</li>
+<li>computes pairwise similarities with matrix multiplication</li>
+<li>converts similarity to a discrete distance score</li>
+<li>tests greedy strategies</li>
+</ul>
+<p>Important pattern:</p>
+<pre><code class="language-python"># Similarity to all words at once.
+sim_full = torch.matmul(embeddings_tensor, torch.t(embeddings_tensor))
+
+# Greedy next-step candidates.
+greedy_best = torch.topk(sim_full, k=32057, axis=1)
+</code></pre>
+<p>What to remember:</p>
+<ul>
+<li>if all vectors are normalized, dot product = cosine similarity</li>
+<li>matrix multiplication gives all-vs-all similarity fast</li>
+<li>greedy is a useful baseline but may fail globally</li>
+<li>when a path problem appears on embeddings, think:</li>
+<li>greedy</li>
+<li>beam search</li>
+<li>shortest path on a graph induced by similarity</li>
+</ul>
+<h3>11.6 <code>pdtn2025/Αντίγραφο_knit.ipynb</code>: optimize line weights to reconstruct an image</h3>
+<p>Problem pattern:</p>
+<ul>
+<li>output is not labels but parameters of a generative construction</li>
+<li>here the construction is a set of weighted lines</li>
+<li>loss is simply image reconstruction error</li>
+</ul>
+<p>What the notebook does:</p>
+<ul>
+<li>defines a differentiable <code>linesToImage(lines)</code></li>
+<li>initializes line weights as zeros</li>
+<li>optimizes those weights directly with SGD</li>
+<li>minimizes mean squared error to the target image</li>
+<li>exports the final weights after scaling/clamping</li>
+</ul>
+<p>Important pattern:</p>
+<pre><code class="language-python"># `lines` are the actual answer variables, not normal dataset features.
+lines = torch.zeros((N//2, N), requires_grad=True)
+optimizer = optim.SGD([lines], lr=0.5)
+
+for step in range(num_steps):
+    # Render the current candidate image from the current line weights.
+    generated_image = linesToImage(lines)
+
+    # Reconstruction loss: the rendered image should match the target image.
+    loss = torch.mean((generated_image - target) ** 2)
+
+    # Optimize the line parameters directly.
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+</code></pre>
+<p>What to remember:</p>
+<ul>
+<li>sometimes the variable you optimize is <strong>not model weights</strong>, but the answer itself</li>
+<li>if the rendering process is differentiable, you can optimize the answer directly</li>
+<li>this is a strong pattern for inverse problems and reconstruction tasks</li>
+</ul>
+<h3>11.7 <code>challenges/squarepainting.ipynb</code>: fit a coordinate -&gt; RGB function with a fixed MLP</h3>
+<p>Problem pattern:</p>
+<ul>
+<li>each input is a coordinate pair <code>(x, y)</code></li>
+<li>each target is a continuous vector <code>(r, g, b)</code></li>
+<li>architecture is fixed, so tuning happens in the training loop and sampling density</li>
+<li>submission is the trained weights, not a predicted table</li>
+</ul>
+<p>What the notebook does:</p>
+<ul>
+<li>samples a dense grid over the unit square</li>
+<li>keeps coordinate inputs and RGB targets as separate tensors</li>
+<li>trains the same fixed architecture on several target functions/images</li>
+<li>renders the learned function back to an image by querying a dense grid</li>
+<li>exports the linear-layer weights to JSON</li>
+</ul>
+<p>Why this matters:</p>
+<ul>
+<li>the same pattern appears in coordinate regression, neural fields, image-as-function tasks, and any problem where the answer is a continuous mapping instead of class labels</li>
+</ul>
+<p>Reusable dataset pattern:</p>
+<pre><code class="language-python">import numpy as np
+import torch
+from torch.utils.data import TensorDataset, random_split
+
+def generate_ds(target_f, samples=200):
+    # Build a dense coordinate grid in [0, 1] x [0, 1].
+    steps = np.linspace(0.0, 1.0, samples, dtype=np.float32)
+    inputs = []
+    targets = []
+
+    for x in steps:
+        for y in steps:
+            # Each input is one coordinate pair.
+            inputs.append([x, y])
+
+            # Each target is the RGB value at that coordinate.
+            targets.append(target_f(float(x), float(y)))
+
+    inputs = torch.tensor(inputs, dtype=torch.float32)
+    targets = torch.tensor(targets, dtype=torch.float32)
+    return TensorDataset(inputs, targets)
+
+full_ds = generate_ds(target_f, samples=200)
+train_size = int(0.8 * len(full_ds))
+val_size = len(full_ds) - train_size
+train_ds, val_ds = random_split(full_ds, [train_size, val_size])
+</code></pre>
+<p>Reusable architecture + training loop:</p>
+<pre><code class="language-python">import copy
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader
+
+def Net():
+    # Fixed contest architecture: 2 inputs -&gt; hidden MLP -&gt; 3 RGB outputs.
+    return nn.Sequential(
+        nn.Linear(2, 20), nn.ReLU(),
+        nn.Linear(20, 20), nn.ReLU(),
+        nn.Linear(20, 20), nn.ReLU(),
+        nn.Linear(20, 20), nn.ReLU(),
+        nn.Linear(20, 20), nn.ReLU(),
+        nn.Linear(20, 20), nn.ReLU(),
+        nn.Linear(20, 3)
+    )
+
+def fit_coordinate_model(target_f, samples=200, epochs=300, batch_size=256):
+    device = &quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;
+    model = Net().to(device)
+
+    # Build train/validation splits from one dense coordinate dataset.
+    full_ds = generate_ds(target_f, samples=samples)
+    train_size = int(0.8 * len(full_ds))
+    val_size = len(full_ds) - train_size
+    train_ds, val_ds = random_split(full_ds, [train_size, val_size])
+
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=0)
+    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=0)
+
+    criterion = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=2e-3)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
+
+    # Keep the best validation checkpoint, not just the final epoch.
+    best_val = float(&quot;inf&quot;)
+    best_state = copy.deepcopy(model.state_dict())
+
+    for epoch in range(epochs):
+        model.train()
+        for xb, yb in train_loader:
+            xb = xb.to(device)
+            yb = yb.to(device)
+
+            optimizer.zero_grad()
+            pred = model(xb)
+            loss = criterion(pred, yb)
+            loss.backward()
+            optimizer.step()
+
+        model.eval()
+        total_val_loss = 0.0
+        with torch.no_grad():
+            for xb, yb in val_loader:
+                xb = xb.to(device)
+                yb = yb.to(device)
+                total_val_loss += criterion(model(xb), yb).item()
+
+        val_loss = total_val_loss / len(val_loader)
+        scheduler.step()
+
+        if val_loss &lt; best_val:
+            best_val = val_loss
+            best_state = copy.deepcopy(model.state_dict())
+
+    model.load_state_dict(best_state)
+    return model
+</code></pre>
+<p>Reusable export pattern:</p>
+<pre><code class="language-python">def export_weights(net):
+    layers = []
+
+    for layer in net:
+        if isinstance(layer, nn.Linear):
+            # Export only trainable linear layers in plain Python lists.
+            layers.append({
+                &quot;weights&quot;: layer.weight.detach().cpu().tolist(),
+                &quot;bias&quot;: layer.bias.detach().cpu().tolist(),
+            })
+
+    return {&quot;layers&quot;: layers}
+</code></pre>
+<p>Important failure modes:</p>
+<ul>
+<li>do <strong>not</strong> <code>stack</code> <code>(N, 2)</code> coordinate inputs with <code>(N, 3)</code> RGB targets</li>
+<li>keep targets as <code>float32</code></li>
+<li>if the fit is blocky, increase sampling density before changing everything else</li>
+<li>if validation is much worse than train, keep a best checkpoint and reduce LR</li>
+<li>on Windows/notebooks, set <code>num_workers=0</code> first if loader workers crash</li>
+</ul>
+<p>What to remember:</p>
+<ul>
+<li>this is supervised regression, not classification</li>
+<li>the final layer should output <code>3</code> floats, one for each RGB channel</li>
+<li><code>MSELoss</code> is the natural first loss</li>
+<li>the answer can be the model weights themselves when the contest wants a function representation</li>
+</ul>
+<h2>12. Highest-Value Local Repo Files</h2>
+<p>Review these before the contest:</p>
+<ul>
+<li><code>comp/train_func.py</code></li>
+<li><code>train_function.py</code></li>
+<li><code>challenges/mnist1.py</code></li>
+<li><code>challenges/cfar1.py</code></li>
+<li><code>challenges/CFAR1001.py</code></li>
+<li><code>challenges/nlp.py</code></li>
+<li><code>challenges/extracted.py</code></li>
+<li><code>decision_trees.py</code></li>
+<li><code>comp/training_bug.md</code></li>
+<li><code>comp/tutor_advice_classification_vs_regression.md</code></li>
+<li><code>emotions.ipynb</code></li>
+<li><code>challenges/nextmovie.ipynb</code></li>
+<li><code>challenges/captcha.ipynb</code></li>
+<li><code>challenges/squarepainting.ipynb</code></li>
+<li><code>challenges/squarepainting.py</code></li>
+<li><code>pdtn2025/deepfakes_final.ipynb</code></li>
+<li><code>pdtn2025/Αντίγραφο_embeddings_greedy_torch (1).ipynb</code></li>
+<li><code>pdtn2025/Αντίγραφο_knit.ipynb</code></li>
+</ul>
+<h2>13. Final Reminder</h2>
+<p>The usual winning pattern is:</p>
+<ul>
+<li>identify the task correctly</li>
+<li>choose the correct cheap baseline</li>
+<li>validate quickly</li>
+<li>submit</li>
+<li>improve only where evidence says it is worth it</li>
+</ul>
+</body>
+</html>
