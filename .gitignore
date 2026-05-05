@@ -44,3 +44,8 @@ pdtn2025/
 /public-clean.txt
 /public-noisy.png
 /public-noisy.txt
+
+# Tutorial artifacts
+tutorials/data/
+tutorials/*.tar.gz
+tutorials/*.pth
