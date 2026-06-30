@@ -1,0 +1,38 @@
+# IOAI/CEOAI practice environment for Python 3.13.
+# Keep this close to the current IOAI technical appendix, with CPU-local
+# practice packages installed into the repo .venv.
+
+jupyterlab
+notebook
+ipykernel
+
+numpy
+pandas
+scipy
+matplotlib
+seaborn
+plotly
+
+scikit-learn
+torch
+torchvision
+torchaudio
+torchinfo
+pytorch-lightning
+
+xgboost
+lightgbm
+catboost
+polars
+pyarrow
+
+opencv-python
+transformers
+nltk
+spacy
+gensim
+
+tqdm
+requests
+gdown
+openpyxl

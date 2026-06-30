@@ -49,6 +49,23 @@ Default behavior:
 
 Do not write implementation code unless the user explicitly asks for code, a template, or a full solution.
 
+## Error Journal Workflow
+
+Treat every practice error as training data for contest performance.
+
+When the user shares a traceback, failed notebook cell, broken script, or confusing result:
+
+1. Identify the error category: syntax, import, path, shape, dtype, pandas, sklearn, PyTorch, metric, leakage, submission, logic, environment, or pressure.
+2. Explain the meaning of the error and the most likely cause.
+3. Suggest the smallest useful debugging checks, such as inspecting shape, dtype, columns, nulls, target separation, metric direction, tensor device, tensor dimensions, or submission format.
+4. Do not provide solution code unless the user explicitly asks for it.
+5. Wait for the user to report what they changed or what actually fixed the issue.
+6. Log the user's fix and the lesson in `reviews/error_journal.jsonl`.
+
+The most important fields are `what_user_was_trying`, `real_cause`, `user_diagnosis_steps`, `user_fix`, and `memory_rule`.
+
+Every few entries, summarize patterns in `reviews/error_pattern_review.md` and recommend one concrete drill that targets the recurring weakness.
+
 ## Syllabus Coverage Model
 
 Use this as the mental checklist.

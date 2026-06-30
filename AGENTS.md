@@ -95,3 +95,23 @@ For `olympiads/IOAI Material/`:
 - Treat `sources/` as original university material.
 - Treat `exercises/` as coach-generated practice prompts.
 - Do not place generated solutions in `exercises/` unless explicitly requested.
+
+## Error Journal Workflow
+
+Use the olympiad error journal as a core training system, not as a failure log.
+
+When the user hits an error during an exercise:
+
+1. Explain what the error means in practical terms.
+2. Ask what the user was trying to do if it is not clear from the notebook or traceback.
+3. Give debugging probes and conceptual hints, but do not write solution code unless the user explicitly asks.
+4. After the user fixes it, log the user's actual diagnosis and fix, not Codex's imagined fix.
+5. Convert the entry into a reusable contest reflex.
+
+Default log location:
+
+```text
+olympiads/reviews/error_journal.jsonl
+```
+
+Use `olympiads/reviews/error_journal_protocol.md` for the schema and review cadence.
