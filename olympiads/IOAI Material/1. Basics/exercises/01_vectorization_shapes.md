@@ -1,89 +1,48 @@
-# Problem Set 01: Vectorization and Shapes
+# Sprint 01: NumPy Shapes and Vectorization
 
 ## Source
 
-Use `../sources/L01.ipynb`, sections 1, 1a, 1b, the pairwise-distance exercise, loop-vs-vectorized timing, and NumPy Shape Gym.
+Use `../sources/L01.ipynb`, sections 1, 1a, 1b, pairwise distance, and NumPy Shape Gym.
 
-## Concepts Covered
+## Time Box
 
-- Replacing Python loops with vectorized NumPy operations.
-- Broadcasting with `keepdims`, `[:, None]`, and `[None, :]`.
-- Boolean and fancy indexing.
-- Matrix multiplication and `einsum`.
-- Pairwise squared distances.
-- Axis choice, reshape, concatenate, and `argmax`.
-- Timing loop-based code versus vectorized code.
+Target: **35-45 minutes**.
 
-## Problems
+Do not explore every NumPy trick. Finish this when you can explain each output
+shape without running the cell.
 
-### 1. Normalize Without Loops
+## One Dense Drill
 
-Create a random matrix with shape `(12, 5)`. Produce:
+Create a random matrix `X` with shape `(12, 5)`. Treat rows as samples and
+columns as features.
+
+Produce:
 
 - a column-centered version,
 - a row-normalized version,
 - a version where all negative values are replaced by zero,
 - the row indices where the first feature is positive.
 
-Self-check:
+Then create another matrix `M` with shape `(8, 4)` and compute the full `(8, 8)`
+matrix of squared Euclidean distances between rows.
 
-- The column means of the centered matrix should be close to zero.
-- Every nonzero row of the normalized matrix should have norm close to one.
-- The ReLU-like matrix should have no negative values.
+## Required Self-Checks
 
-Hints:
+- `X_centered.mean(axis=0)` is close to zero.
+- `np.linalg.norm(X_row_normalized, axis=1)` is close to one for nonzero rows.
+- The ReLU-like matrix has no negative values.
+- The first-feature result contains row indices, not full rows.
+- The distance matrix has shape `(8, 8)`, diagonal close to zero, and is symmetric.
+
+## Hints
 
 1. Inspect shapes before and after each operation.
 2. Use `axis=0` for column statistics and `axis=1` for row statistics.
 3. Use `keepdims=True` when a denominator must broadcast across columns.
+4. For distances, start from `||x_i - x_j||^2 = ||x_i||^2 + ||x_j||^2 - 2 x_i dot x_j`.
+5. If a result is wrong, print only shapes first. Do not debug values before shapes.
 
-### 2. Batched Matrix Products
+## Stop Condition
 
-Make two arrays with shapes `(7, 4, 6)` and `(7, 6, 3)`. Compute the batch-wise matrix product so the result has shape `(7, 4, 3)`.
-
-Self-check:
-
-- Compare the first batch result against ordinary matrix multiplication on batch `0`.
-- Confirm that no explicit loop is used in the final version.
-
-Hints:
-
-1. The notebook uses `einsum` for this exact pattern.
-2. Write down the meaning of each dimension before writing the expression.
-3. If the output shape is wrong, your index labels probably preserve or sum over the wrong axis.
-
-### 3. Pairwise Squared Distances
-
-Given a matrix `M` of shape `(n, d)`, compute the full `(n, n)` matrix of squared Euclidean distances between rows.
-
-Self-check:
-
-- The diagonal should be close to zero.
-- The matrix should be symmetric.
-- All entries should be nonnegative, allowing tiny numerical error.
-
-Hints:
-
-1. Start from `||x_i - x_j||^2 = ||x_i||^2 + ||x_j||^2 - 2 x_i dot x_j`.
-2. Compute all row squared norms as a vector of shape `(n,)`.
-3. Use broadcasting to combine the norm vector with itself.
-
-### 4. Shape Gym
-
-Create an `(8, 4)` feature matrix and a weight vector with shape `(4,)`. Compute scores, binary predictions, class counts, and the index of the largest score.
-
-Self-check:
-
-- The score vector should have shape `(8,)`.
-- The prediction vector should contain only `0` and `1`.
-- The class counts should sum to `8`.
-
-Hints:
-
-1. Use matrix-vector multiplication for scores.
-2. Convert booleans to integers only after the comparison is correct.
-3. Think about whether `argmax` is over samples or over features.
-
-### Stretch
-
-Time a loop implementation and a vectorized implementation of one task above. Record the speed ratio and explain why vectorization matters in leaderboard-style experimentation.
+Stop when the self-checks pass and you can say what each axis means. Skip
+batched `einsum` for now unless a later neural-network task needs it.

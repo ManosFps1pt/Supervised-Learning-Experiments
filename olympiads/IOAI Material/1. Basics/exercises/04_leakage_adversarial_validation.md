@@ -1,4 +1,10 @@
-# Problem Set 04: Leakage and Adversarial Validation
+# Deferred Reference: Leakage and Adversarial Validation
+
+This file is not part of the 13-day sprint path. Use `03_metrics_plots.md` for
+the compressed required version.
+
+Open this only if a later task gives you a suspicious score, distribution shift,
+or a validation split you do not trust.
 
 ## Source
 
