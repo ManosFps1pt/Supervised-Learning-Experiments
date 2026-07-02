@@ -15,9 +15,17 @@ print(X_relu)
 positive_first_feature_rows = X[X[:,0]>0]
 print(positive_first_feature_rows)
 #%%
-# problem 2
 X1 = np.random.randn(7, 4, 6)
 X2 = np.random.randn(7, 6, 3)
 print((X1 @ X2).shape)
 print(np.einsum("xij,xjy->xiy", X1, X2).shape)
 # %%
+M = np.random.randn(8, 4)
+# %%
+# problem 2
+n = 100_000
+table = pd.DataFrame({
+    "division": np.random.choice("AB", n),
+    "NPOPR": np.random.randint(20, 250, n),
+    "RP": np.random.rand(n) * 6
+})

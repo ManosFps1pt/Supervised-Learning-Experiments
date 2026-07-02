@@ -1,0 +1,234 @@
+{
+  "supervised_learning_and_ml": [
+    {
+      "file_id": "12fEpyjWshpdqG4XaPKSpO9EYqtag4-zy",
+      "source_url": "https://colab.research.google.com/drive/12fEpyjWshpdqG4XaPKSpO9EYqtag4-zy?usp=sharing",
+      "saved_as": "supervised_learning_and_ml/ml_00_colab_notebooks_se_python.ipynb",
+      "bytes": 5786
+    },
+    {
+      "file_id": "162hNnEDlmoAzcNFhEMQFmMXFQeVPHgHr",
+      "source_url": "https://colab.research.google.com/drive/162hNnEDlmoAzcNFhEMQFmMXFQeVPHgHr?usp=sharing",
+      "saved_as": "supervised_learning_and_ml/ml_04_05_decision_trees_diabetes.ipynb",
+      "bytes": 38586
+    },
+    {
+      "file_id": "1WZ4ho2InMZksR-2GINRJfxiAKMnk1ryT",
+      "source_url": "https://colab.research.google.com/drive/1WZ4ho2InMZksR-2GINRJfxiAKMnk1ryT?usp=drive_link",
+      "saved_as": "supervised_learning_and_ml/ml_07_overfitting_in_python.ipynb",
+      "bytes": 29577
+    },
+    {
+      "file_id": "1qv3oE3adlxBuLl6H2jHzj4UvLKw96qPf",
+      "source_url": "https://colab.research.google.com/drive/1qv3oE3adlxBuLl6H2jHzj4UvLKw96qPf?usp=drive_link",
+      "saved_as": "supervised_learning_and_ml/ml_08_overfitting_cifar10.ipynb",
+      "bytes": 26317
+    },
+    {
+      "file_id": "1gVhD4oqLVCGFTkL1JO6JDt2VpuDIOfNQ",
+      "source_url": "https://colab.research.google.com/drive/1gVhD4oqLVCGFTkL1JO6JDt2VpuDIOfNQ?usp=drive_link",
+      "saved_as": "supervised_learning_and_ml/ml_09_overfitting_underfitting_regression.ipynb",
+      "bytes": 27628
+    },
+    {
+      "file_id": "1xDZPLPtRaBPZIH0XszO8egUq-OSlBz-8",
+      "source_url": "https://colab.research.google.com/drive/1xDZPLPtRaBPZIH0XszO8egUq-OSlBz-8?usp=sharing",
+      "saved_as": "supervised_learning_and_ml/ml_12_neural_networks_feedforward_1.ipynb",
+      "bytes": 25655
+    },
+    {
+      "file_id": "1EVNEGakrtSQTHcUdO_lYJPSIPMHEjJZb",
+      "source_url": "https://colab.research.google.com/drive/1EVNEGakrtSQTHcUdO_lYJPSIPMHEjJZb?usp=sharing",
+      "saved_as": "supervised_learning_and_ml/ml_13_neural_networks_feedforward_2.ipynb",
+      "bytes": 22276
+    },
+    {
+      "file_id": "1hCXEaMOxXnxWPoPn9YYufDF2huHUgHAS",
+      "source_url": "https://colab.research.google.com/drive/1hCXEaMOxXnxWPoPn9YYufDF2huHUgHAS?usp=sharing",
+      "saved_as": "supervised_learning_and_ml/ml_14_training_neural_networks.ipynb",
+      "bytes": 49322
+    },
+    {
+      "file_id": "1SHuJTmahC6w-KoMrcMm4IppIJ3Ycut5H",
+      "source_url": "https://colab.research.google.com/drive/1SHuJTmahC6w-KoMrcMm4IppIJ3Ycut5H?usp=sharing",
+      "saved_as": "supervised_learning_and_ml/ml_17_cnns_mnist.ipynb",
+      "bytes": 35808
+    },
+    {
+      "file_id": "1PMhVak3v8e5nCcvQEEGvBNdcLalYcCeW",
+      "source_url": "https://colab.research.google.com/drive/1PMhVak3v8e5nCcvQEEGvBNdcLalYcCeW?usp=drive_link",
+      "saved_as": "supervised_learning_and_ml/ml_18_cnns_cifar10.ipynb",
+      "bytes": 797739
+    },
+    {
+      "file_id": "1tnIQoViTVbT-7XiJa791h492B_WuNw4t",
+      "source_url": "https://colab.research.google.com/drive/1tnIQoViTVbT-7XiJa791h492B_WuNw4t?usp=sharing",
+      "saved_as": "supervised_learning_and_ml/ml_20_transfer_learning_resnet18_cifar10.ipynb",
+      "bytes": 155664
+    },
+    {
+      "file_id": "1Slmo9U12kZXqA_xN6sehVL54MTVyWMrR",
+      "source_url": "https://colab.research.google.com/drive/1Slmo9U12kZXqA_xN6sehVL54MTVyWMrR?usp=sharing",
+      "saved_as": "supervised_learning_and_ml/ml_21_transfer_learning_ultrasounds.ipynb",
+      "bytes": 55142
+    }
+  ],
+  "generative_ai_and_nlp": [
+    {
+      "file_id": "1_GV04tROrvMtU7oztCOceQ4T9DaPmnrl",
+      "source_url": "https://colab.research.google.com/drive/1_GV04tROrvMtU7oztCOceQ4T9DaPmnrl?usp=sharing",
+      "saved_as": "generative_ai_and_nlp/genai_05_06_logistic_regression_sklearn_pytorch.ipynb",
+      "bytes": 852005
+    },
+    {
+      "file_id": "1CifUm0LwhrLfbomoepXIDssUI6dC3pYz",
+      "source_url": "https://colab.research.google.com/drive/1CifUm0LwhrLfbomoepXIDssUI6dC3pYz?usp=sharing",
+      "saved_as": "generative_ai_and_nlp/genai_08_image_embeddings_1.ipynb",
+      "bytes": 507173
+    },
+    {
+      "file_id": "1rRp0e07Z8U0RmvJTDQt20gemPTQCKNs5",
+      "source_url": "https://colab.research.google.com/drive/1rRp0e07Z8U0RmvJTDQt20gemPTQCKNs5?usp=sharing",
+      "saved_as": "generative_ai_and_nlp/genai_09_image_embeddings_2.ipynb",
+      "bytes": 1231123
+    },
+    {
+      "file_id": "1dfmCgiNyNoxnam-JxfoPrQWhYWfSvDox",
+      "source_url": "https://colab.research.google.com/drive/1dfmCgiNyNoxnam-JxfoPrQWhYWfSvDox?usp=sharing",
+      "saved_as": "generative_ai_and_nlp/genai_11_word2vec.ipynb",
+      "bytes": 25170
+    },
+    {
+      "file_id": "1DTLrAojU4pLfNPPMhIJjA_MOlo7IQ9uM",
+      "source_url": "https://colab.research.google.com/drive/1DTLrAojU4pLfNPPMhIJjA_MOlo7IQ9uM?usp=sharing",
+      "saved_as": "generative_ai_and_nlp/genai_14_15_bag_of_words_tfidf.ipynb",
+      "bytes": 189832
+    },
+    {
+      "file_id": "19zJiRPA4IqZH9oF34Fc77W_JoBv0ONMv",
+      "source_url": "https://colab.research.google.com/drive/19zJiRPA4IqZH9oF34Fc77W_JoBv0ONMv?usp=sharing",
+      "saved_as": "generative_ai_and_nlp/genai_17_semantic_search.ipynb",
+      "bytes": 272448
+    },
+    {
+      "file_id": "1PAKIUh11Fb-16qZe1lgo8y71ufIbBIVe",
+      "source_url": "https://colab.research.google.com/drive/1PAKIUh11Fb-16qZe1lgo8y71ufIbBIVe?usp=sharing",
+      "saved_as": "generative_ai_and_nlp/genai_20_bert_classification.ipynb",
+      "bytes": 203808
+    },
+    {
+      "file_id": "1ArB36cnvRWob7yO-y-IB_vqj5wvzv7rm",
+      "source_url": "https://colab.research.google.com/drive/1ArB36cnvRWob7yO-y-IB_vqj5wvzv7rm?usp=drive_link",
+      "saved_as": "generative_ai_and_nlp/genai_22_bert_automodelformaskedlm_embeddings.ipynb",
+      "bytes": 126933
+    },
+    {
+      "file_id": "13tbsXYLaEqrdlSfXI_CZXywyh0paLx4Z",
+      "source_url": "https://colab.research.google.com/drive/13tbsXYLaEqrdlSfXI_CZXywyh0paLx4Z?usp=sharing",
+      "saved_as": "generative_ai_and_nlp/genai_23_finetuning_bert_minilm_scifact.ipynb",
+      "bytes": 251790
+    }
+  ],
+  "supervised_learning_and_ml_slides": [
+    {
+      "source_url": "https://caramanis.github.io/pdfs/mlclass/L01.pdf",
+      "saved_as": "supervised_learning_and_ml/slides/L01.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/mlclass/L02.pdf",
+      "saved_as": "supervised_learning_and_ml/slides/L02.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/mlclass/L03.pdf",
+      "saved_as": "supervised_learning_and_ml/slides/L03.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/mlclass/L06.pdf",
+      "saved_as": "supervised_learning_and_ml/slides/L06.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/mlclass/L10.pdf",
+      "saved_as": "supervised_learning_and_ml/slides/L10.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/mlclass/L11.pdf",
+      "saved_as": "supervised_learning_and_ml/slides/L11.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/mlclass/L15.pdf",
+      "saved_as": "supervised_learning_and_ml/slides/L15.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/mlclass/L16.pdf",
+      "saved_as": "supervised_learning_and_ml/slides/L16.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/mlclass/L19.pdf",
+      "saved_as": "supervised_learning_and_ml/slides/L19.pdf"
+    }
+  ],
+  "generative_ai_and_nlp_slides": [
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/L01.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/L01.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/L02.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/L02.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/L03.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/L03.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/L04.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/L04.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/L07.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/L07.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/L10.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/L10.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/L12.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/L12.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/L13.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/L13.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/L16.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/L16.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/L18.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/L18.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/L19.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/L19.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/L21.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/L21.pdf"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/under_construction.pdf",
+      "saved_as": "generative_ai_and_nlp/slides/under_construction.pdf"
+    }
+  ],
+  "missing_published_slide_assets": [
+    {
+      "source_url": "https://caramanis.github.io/pdfs/genaiclass/LectureSlides.zip",
+      "reason": "published on page but returns 404"
+    },
+    {
+      "source_url": "https://caramanis.github.io/pdfs/mlclass/LectureSlides.zip",
+      "reason": "intentionally ignored because slides were collected from individual PDF links only"
+    }
+  ]
+}
