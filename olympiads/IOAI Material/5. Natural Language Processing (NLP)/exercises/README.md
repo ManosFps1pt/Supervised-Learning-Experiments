@@ -13,6 +13,17 @@ Focus areas:
 - initialization strategies
 - language-model basics
 - transformer intuition
+- retrieval baselines and ranking metrics
+- BERT batch/shape contracts
+- InfoNCE-style embedding fine-tuning
 
 No solution code should be generated here unless explicitly requested.
+
+## Current Practice Path
+
+1. `01_nlp_level_check.md` - first contact with tiny language modeling and text
+   vectors.
+2. `02_caramanis_nlp_speed_drills.md` - CEOAI/IOAI exam-mode NLP sprint:
+   direct syllabus coverage, metrics, pretrained encoder workflow, and
+   submission-style output.
 

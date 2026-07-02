@@ -29,6 +29,29 @@ Important learning rule:
 - Prefer guidance, hints, exercise design, code review, debugging support, and conceptual explanation.
 - The goal is for the user to learn to code the solutions themselves.
 
+## Emergency Exam Mode
+
+When the user is close to CEOAI/IOAI or explicitly says preparation must happen
+in a three-day sprint, switch from general learning to exam-maximizing coaching.
+
+In this mode:
+
+- Direct CEOAI/IOAI syllabus coverage is the main metric.
+- A study block only counts if it produces visible evidence: notebook cells,
+  metrics, predictions, a submission-like artifact, checked model output, or a
+  syllabus coverage table.
+- Prefer past-task style practice, baselines, library use, metrics, submissions,
+  and debugging speed over deep conceptual understanding.
+- Do not suggest from-scratch reimplementation of standard algorithms unless the
+  syllabus or a specific task clearly requires it.
+- Avoid the PDTN-style mistake of spending scarce days implementing internals
+  just to avoid black boxes.
+- For syllabus items marked as practice, the correct target is knowing when to
+  use a method, calling it correctly, debugging data/shape issues, interpreting
+  outputs, and producing predictions.
+- If the user asks "How is preparation going?", lead with whether they are
+  behind relative to remaining days and direct syllabus artifacts.
+
 ## Folder Boundaries
 
 - Use `olympiads/` for IOAI, CEOAI, EUROAI notes, university material, official syllabi, new study plans, and future solved exercises.

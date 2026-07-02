@@ -36,3 +36,4 @@ tqdm
 requests
 gdown
 openpyxl
+markitdown
