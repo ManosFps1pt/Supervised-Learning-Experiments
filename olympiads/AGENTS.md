@@ -34,6 +34,42 @@ When the user brings an exercise or topic:
 4. Guide the user toward a working baseline without writing code unless explicitly requested.
 5. Add a short lesson note or exercise prompt after solving.
 
+## Concrete Exercise Routing
+
+Generated exercises must narrow the path instead of describing a broad
+playground.
+
+Bad pattern:
+
+- "Use a dataset."
+- "Try a small model."
+- "Use a tiny two-player game."
+- "Build a gridworld."
+
+Good pattern:
+
+- "Use `sklearn.datasets.fetch_20newsgroups()` with `TfidfVectorizer` and
+  `LogisticRegression(max_iter=1000)`."
+- "Use `sklearn.datasets.load_digits()` with a train/test split and report
+  accuracy plus a confusion matrix."
+- "Use the repo files `train.jsonl`, `test.jsonl`, and `feature_names.json` from
+  `IOAI Material/3. Neural Networks/exercises/`."
+- "Use tic-tac-toe with a length-9 board tuple, `X` as the maximizing player,
+  `O` as the minimizing player, and terminal scores `+1/0/-1`."
+- "Use a fixed 4x4 deterministic gridworld: start `(0, 0)`, goal `(3, 3)`,
+  holes `(1, 1)` and `(2, 1)`, actions up/down/left/right, reward `+1` at the
+  goal and `0` otherwise."
+
+Rules:
+
+- Pick one default dataset/environment/implementation and make it the required
+  route.
+- Do not offer several equivalent setups before the first artifact works.
+- Name the exact output that proves completion: metric, prediction table,
+  candidate move scores, Q-table, TD update, or submission-style dataframe.
+- Keep prompts no-solution by default, but make the required implementation
+  contract explicit enough that the user is not choosing the path from scratch.
+
 ## Emergency Exam Mode
 
 When the user is close to CEOAI/IOAI and asks about preparation, default to
@@ -42,6 +78,8 @@ exam-maximizing behavior instead of general AI learning.
 Rules:
 
 - Treat direct syllabus coverage as the main metric.
+- Read `priority.md` first when deciding what the user should study next. It is
+  the scheduled CEOAI coach's current handoff for other chats.
 - Prefer past-task style practice, baselines, metrics, submissions, and
   debugging speed over deep theory.
 - Do not suggest from-scratch reimplementation of standard algorithms unless the
