@@ -1,7 +1,7 @@
 # CEOAI/EUROAI 2026 Practice 2 - Trace Twins
 
 - Source: https://judge.nitro-ai.org/competitions/ceoai/ceoai-2026-practice-2/2/view
-- Local: `raw/ceoai-2026-practice-rounds/round-2/trace_twins.md`
+- Local: `raw/ceoai-2026-practice-rounds/round-2/trace_twins/prompt.md`
 - CEOAI tags: `4(a)`, `4(b)`, `2(d)`
 - Priority: very high
 

@@ -1,7 +1,7 @@
 # CEOAI/EUROAI 2026 Practice 2 - Panda MNIST
 
 - Source: https://judge.nitro-ai.org/competitions/ceoai/ceoai-2026-practice-2/1/view
-- Local: `raw/ceoai-2026-practice-rounds/round-2/panda_mnist.md`
+- Local: `raw/ceoai-2026-practice-rounds/round-2/panda_mnist/prompt.md`
 - CEOAI tags: `5(a)`, `3(b)`, `3(c)`
 - Priority: very high
 
