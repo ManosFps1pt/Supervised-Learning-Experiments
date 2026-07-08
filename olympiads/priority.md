@@ -2,87 +2,110 @@
 
 ## Status
 
-Current date: 2026-07-04. CEOAI starts 2026-07-14.
+Current date: 2026-07-08. CEOAI starts 2026-07-14.
 
-Calendar days left: 10. Effective work days left excluding 2026-07-13: 9.
+Calendar days left: 6. Effective work days left excluding 2026-07-13: 5.
 
-Since the previous automation run, pace is FAST, but the overall sprint is still behind. Search/RL is already analyzed enough to stop being the next-block priority. CV now has one executed CNN baseline. The remaining hole is broad CEOAI ML and DL coverage: classical models, ensembles, clustering, dimensionality reduction, and more deep-learning rows still lack enough executed repo evidence.
+Pace since previous automation run: SLOW. Baseline used: prompt-provided last run timestamp `2026-07-07T14:01:58.793Z` / local `2026-07-07 17:01:58`, plus the previous `priority.md` because the automation memory file was missing.
 
-Baseline for comparison: previous automation run timestamp 2026-07-04T05:06:54.114Z and the automation memory entry dated 2026-07-04T08:11:05.8250361+03:00.
+Overall verdict: behind overall. Target schedule status: behind for the 2026-07-08 onward timed mixed-practice phase. Since the last run, the repo shows useful problem-description correction work, but no new score, regenerated Concepts zip, classifier score, clustering labels, submission-like file, value/Q/policy table, or confusion matrix.
+
+Cumulative position already counted before this interval: Search/RL comparison, minimax/A*/MDP/Q-table lesson work, NLP TF-IDF/BERT/language-model drills, classical ML and clustering lessons, MNIST/CV benchmark, PyTorch regression/two-moons notebooks, Romania ONIA outputs, Polish imbalanced-classification score, Help BOBAI router/submission artifacts, IOAI 2025 Chicken Counting `submission.npz` and `score.json`, IOAI 2025 Concepts valid JSONL/zip with `0.0` score, archive indexing, task cards, translations, queue setup, and Markov Maze value/policy/submission-style evidence.
+
+Highest live weakness: IOAI 2025 Concepts still has valid file format but saved score evidence remains `hit@10: 0.0`, `NDCG@10: 0.0`, and `Final Score: 0.0`. The required repair artifact from the previous handoff was not completed.
 
 ## New Since Previous Run
 
-- `olympiads/IOAI Material/7. Reinforcement Learning and AI Search/exercises/search_rl_comparison.md`
-  - Counts for CEOAI `1(c)` Monte Carlo method and strengthens `1(e)` Temporal Difference Learning.
-  - Evidence: no blank recognition rows, completed Monte Carlo vs TD vs Q-learning table, and one-sentence contracts for all six Search/RL methods.
-- `olympiads/IOAI Material/7. Reinforcement Learning and AI Search/exercises/solution2.ipynb`
-  - Counts as the saved minimax artifact replacing the split block files for CEOAI `1(b)`.
-  - Evidence: executed move-score telemetry and a saved completion markdown cell.
-- `olympiads/IOAI Material/8. Computer Vision/exercises/cv_mnist_personal_benchmark.ipynb`
-  - Counts for CEOAI `5(b)` CNN architectures and IOAI image-classification practice.
-  - Evidence: executed MNIST CNN training with saved accuracy up to about `0.988`, saved adversarial-image cells, and saved prediction/confidence output.
-- `olympiads/reviews/error_journal.jsonl`
-  - New resolved MNIST preview-label and CrossEntropy target-dtype entries support the CV notebook.
-  - One open evaluation-loop entry still looks stale against the saved notebook and should be cleaned only after rechecking the notebook cell contract.
+Counted as limited study evidence, not competition-artifact progress:
 
-Already counted before: A* notebook, earlier gridworld Q-learning notebook, NLP TF-IDF/BERT/language-model/submission notebooks, and the basic PyTorch regression/two-moons notebooks.
+- `olympiads/competition_samples/problem_description_analysis_log.md`
+  - New corrected entries for Polish OAI 2025 Hallucination Detection, Polish OAI 2025 Source Extraction, Polish OAI 2024 Pruning, and NEOAI 2025 Broken BERT.
+  - Syllabus mapping:
+    - Hallucination Detection: CEOAI `4(b)` embeddings / representations, CEOAI `4(c)` related NLP architectures.
+    - Source Extraction: CEOAI `4(b)` embeddings / representations, CEOAI `4(c)` related NLP architectures.
+    - Pruning: CEOAI `3(b)` neural-network optimization, CEOAI `3(c)` model architecture / parameters.
+    - Broken BERT: CEOAI `4(b)`, `4(c)`, and CEOAI `3(c)` transformer/encoder recognition.
+  - Competition pattern trained: statement parsing, metric identification, baseline route selection, constraints, output-contract awareness.
+  - Verdict: useful, but insufficient. It did not produce a score, prediction table, confusion matrix, zip/jsonl regeneration, model-parameter artifact, or checked submission.
 
-Current unfinished CEOAI-only concept scope:
+- `olympiads/competition_samples/problem_description_analysis_protocol.md`
+  - Syllabus mapping: none directly.
+  - Competition pattern trained: statement-analysis workflow.
+  - Verdict: process scaffolding only. Does not count as competition readiness by itself.
 
-- Section 2 ML: classical algorithms, clustering, ensemble methods, dimensionality reduction.
-- Section 3 DL: perceptron, MLP, backpropagation, SGD/Adam/RMSProp, learning-rate schedules, regularization, dropout, batch normalization, CNNs, RNNs, LSTM, GRU, transformers, autoencoders, VAE, GANs, diffusion models.
-- Section 4 NLP: preprocessing, embeddings, related architectures such as Seq2Seq, T5, LLaMA where repo evidence is still weaker than Search/RL.
-- Section 5 CV: processing, CNN architectures, related architectures such as YOLO, Stable Diffusion, ViT beyond the single MNIST CNN baseline.
+- Translated notebooks:
+  - `olympiads/competition_samples/raw/polish-oai-2025-sparse/1_etap/2_wykrywanie_halucynacji/2_wykrywanie_halucynacji_translated_en.ipynb`
+  - `olympiads/competition_samples/raw/polish-oai-2025-sparse/2_etap/ekstrakcja_zrodel/ekstrakcja_zrodel_translated_en.ipynb`
+  - `olympiads/competition_samples/raw/polish-oai-2024-sparse/first_stage/pruning/pruning_translated_en.ipynb`
+  - `olympiads/competition_samples/raw/neoai-2025-sparse/5_Broken_BERT/broken_bert_solution_translated_en.ipynb`
+  - Syllabus mapping: NLP `4(b)/4(c)`, DL `3(b)/3(c)`, transformer recognition `3(c)`.
+  - Competition pattern trained: source accessibility and statement comprehension only.
+  - Verdict: not enough. Hallucination and Pruning translated notebooks have zero executed cells and no outputs. Source Extraction has no outputs. Broken BERT has old/inherited solution outputs, not a new local repaired-model attempt.
 
-Exclude completely from this handoff because they are not in CEOAI syllabus:
+Not counted:
 
-- Audio.
-- HuBERT.
-- Whisper.
-- Voxtral.
-- Qwen-Audio.
-- Any IOAI-only audio workflow.
+- `olympiads/IOAI Material/2. (Mostly) Linear models/exercises/README.md` update: organizational note only.
+- Any raw archive/source collection after the cutoff: no score/output evidence.
+- Kazakhstan clustering remains blocked unless `train.csv` and `sample_submission.csv` are found locally.
+- The new blank IOAI Concepts log template at the bottom of `problem_description_analysis_log.md`: incomplete and not counted.
 
 ## Study Next
 
-1. Target file: `olympiads/IOAI Material/2. (Mostly) Linear models/exercises/ml_digits_benchmark.ipynb`
-   - Syllabus tag: CEOAI `2(a)` Classical algorithms and `2(c)` Ensemble Methods.
-   - Required visible evidence: executed `load_digits()` baseline with at least `LogisticRegression`, `SVC`, `KNeighborsClassifier`, `DecisionTreeClassifier`, and `RandomForestClassifier`, plus one metrics table and one confusion matrix.
-   - Why highest value: one notebook closes the largest remaining CEOAI Section 2 gap fastest.
+1. Target file: `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/Concepts.ipynb`
+   - Syllabus tag: CEOAI `4(b)` embeddings / representations, CEOAI `4(c)` related NLP architectures, CEOAI `3(c)` transformer/encoder recognition.
+   - Competition pattern trained: metric-driven repair, model-output inspection, discriminative feature/clue strategy, JSONL/zip submission validation.
+   - Required visible evidence: regenerate `out/clues_a.jsonl`, `out/clues_b.jsonl`, and `out/submission.zip`; save either a score above `0.0` or three inspected weak cases with label/options/current clues/guesser output and one changed clue-generation strategy.
+   - Why this is highest value: the task already has a valid file contract but zero useful score. Repairing a zero-score official NLP/embedding task is more valuable than opening another notebook.
+   - Target schedule slot: 2026-07-08 timed mixed-practice repair block.
 
-2. Target file: `olympiads/IOAI Material/2. (Mostly) Linear models/exercises/ml_clustering_pca_drill.ipynb`
-   - Syllabus tag: CEOAI `2(b)` Clustering and `2(d)` Dimensionality Reduction.
-   - Required visible evidence: executed PCA-to-2D projection, K-Means labels, DBSCAN labels, and one short comparison note saying when each method is useful.
-   - Why highest value: after the supervised benchmark, this is the quickest way to remove the remaining CEOAI ML blind spot before more polishing.
+2. Target file: `olympiads/competition_samples/raw/polish-oai-2025-sparse/1_etap/2_wykrywanie_halucynacji/2_wykrywanie_halucynacji_translated_en.ipynb`
+   - Syllabus tag: CEOAI `4(b)` embeddings / representations, CEOAI `4(c)` related NLP architectures.
+   - Competition pattern trained: binary classification metric, allowed-library feature engineering, ROC AUC, baseline-first NLP modeling.
+   - Required visible evidence: one executed baseline producing validation ROC AUC, plus three inspected false positives or false negatives.
+   - Why second: use this only if Concepts gets real evidence quickly. It converts the new statement-analysis work into a scored NLP artifact.
+   - Target schedule slot: 2026-07-08 stretch only after Concepts pass.
 
 ## Pass/Fail Check Before Next Run
 
-Pass only if:
+Pass if `Concepts.ipynb` has new post-2026-07-08 execution evidence and `out/clues_a.jsonl`, `out/clues_b.jsonl`, and `out/submission.zip` are regenerated after this handoff, with either score above `0.0` or three explicit weak-case inspections tied to a changed strategy.
 
-- `ml_digits_benchmark.ipynb` exists with executed cells, a model-comparison table, and at least one confusion matrix or classification report saved in outputs.
-- `ml_clustering_pca_drill.ipynb` exists with executed PCA scatter output and both K-Means and DBSCAN results saved.
+Stretch pass if Hallucination Detection has an executed ROC AUC baseline and three inspected mistakes.
 
-Fail if:
-
-- Work is only reading, source collection, markdown planning, or empty notebook scaffolding.
-- Search/RL is revisited instead of closing one of the ML artifacts above.
+Fail if the next interval produces only more translations, descriptions, archive curation, raw downloads, task-card edits, or an unchanged Concepts `submission.zip` with no weak-case diagnosis.
 
 ## Avoid Until This Is Done
 
-- More Search/RL cleanup.
-- More broad reading.
-- More slide/PDF collection.
-- Any audio work.
-- Refactoring notebooks that already count.
-- From-scratch implementations when scikit-learn already covers the syllabus row.
+- Opening another new competition sample.
+- More translations.
+- More archive curation or source indexing.
+- Kazakhstan clustering recovery unless the official CSVs are already present.
+- Old MNIST/CV cleanup.
+- Audio.
+- IOAI team/generative-media tasks.
+- From-scratch standard algorithm reimplementation.
+- Any task that does not produce a score, confusion matrix, prediction table, submission-like file, clustering labels, checked model output, value/Q/policy table, or explicit format validation.
 
 ## Evidence To Recheck
 
+- `olympiads/competition_samples/problem_pattern_analysis.md`
+- `olympiads/competition_samples/practice_queue.md`
+- `olympiads/competition_samples/source_index.csv`
+- `olympiads/competition_samples/problem_description_analysis_log.md`
+- `olympiads/competition_samples/problem_description_analysis_protocol.md`
+- `olympiads/competition_samples/task_cards/ioai_2025_concepts.md`
+- `olympiads/competition_samples/task_cards/poland_2025_hallucination.md`
+- `olympiads/competition_samples/task_cards/poland_2025_source_extraction.md`
+- `olympiads/competition_samples/task_cards/kazakhstan_day2_player_clustering.md`
+- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/Concepts.ipynb`
+- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/out/clues_a.jsonl`
+- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/out/clues_b.jsonl`
+- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/out/submission.zip`
+- `olympiads/competition_samples/raw/polish-oai-2025-sparse/1_etap/2_wykrywanie_halucynacji/2_wykrywanie_halucynacji_translated_en.ipynb`
+- `olympiads/competition_samples/raw/polish-oai-2025-sparse/2_etap/ekstrakcja_zrodel/ekstrakcja_zrodel_translated_en.ipynb`
+- `olympiads/competition_samples/raw/polish-oai-2024-sparse/first_stage/pruning/pruning_translated_en.ipynb`
+- `olympiads/competition_samples/raw/neoai-2025-sparse/5_Broken_BERT/broken_bert_solution_translated_en.ipynb`
 - `olympiads/ceoai_syllabus.md`
 - `olympiads/ioai_syllabus.md`
 - `olympiads/schedule.csv`
-- `olympiads/IOAI Material/7. Reinforcement Learning and AI Search/exercises/search_rl_comparison.md`
-- `olympiads/IOAI Material/7. Reinforcement Learning and AI Search/exercises/solution2.ipynb`
-- `olympiads/IOAI Material/8. Computer Vision/exercises/cv_mnist_personal_benchmark.ipynb`
-- `olympiads/IOAI Material/2. (Mostly) Linear models/exercises/`
 - `olympiads/reviews/error_journal.jsonl`
+- `C:\Users\Manos\.codex\automations\ceoai-dynamic-study-coach-2\memory.md`

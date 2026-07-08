@@ -12,12 +12,21 @@ challenges/answers.json
 # Data
 data/
 challenges/data/
+olympiads/*.zip
+olympiads/competition_samples/raw/**/*.zip
 
 # Python
 __pycache__/
 .mypy_cache/
 .venv/
+.venv-*/
 *.pyc
+
+# Local scratch/temp files
+.tmp/
+tmp/
+*.part
+*.tmp
 
 # IDE
 .idea/

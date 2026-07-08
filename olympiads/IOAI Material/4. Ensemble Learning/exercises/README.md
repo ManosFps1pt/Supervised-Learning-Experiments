@@ -16,6 +16,8 @@ Focus areas:
 
 Current CEOAI sprint path:
 
+- `03_ceoai_ensemble_raw_embedding_drill.md` - current raw drill for building
+  the single ensemble-comparison notebook.
 - `02_ceoai_ensemble_guided_extension.md` - active guided extension for the
   same one-notebook ML sprint.
 - `01_ceoai_ensemble_evening_drill.md` - older rough drill map kept for
