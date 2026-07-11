@@ -1,0 +1,36 @@
+# =====================================================================
+#  Computer Vision Workshop - Python dependencies
+# ---------------------------------------------------------------------
+#  Install everything with:   pip install -r requirements.txt
+#  Everything here runs on CPU. A GPU only makes things faster.
+# =====================================================================
+
+# --- Core deep learning ---
+torch                 # PyTorch: the tensor + neural-network engine
+torchvision           # Image datasets, transforms and model utilities
+
+# --- Hugging Face ecosystem ---
+transformers          # Pretrained models (ResNet, ViT, DETR, CLIP, SegFormer...)
+datasets              # Easy access to ready-made datasets
+accelerate            # Helps run models on CPU/GPU without extra code
+diffusers             # Stable Diffusion and other image-generation models
+peft                  # Parameter-Efficient Fine-Tuning (LoRA, etc.)
+
+# --- Classical CV + image handling ---
+opencv-python         # OpenCV: classical computer vision (blur, edges, HOG)
+pillow                # Loading / saving images (PIL)
+scikit-image          # Extra image algorithms (used for HOG visualisation)
+
+# --- Numerics + plotting ---
+numpy                 # Arrays and math
+matplotlib            # Displaying images and results
+scikit-learn          # Metrics + t-SNE dimensionality reduction
+umap-learn            # UMAP: fast 2-D projection of embeddings
+torchinfo             # Prints a layer/parameter summary of each model
+torchmetrics          # Detection metrics: mAP / mAP@50 / AR (script 04)
+pycocotools           # COCO-style mAP backend used by torchmetrics
+ultralytics           # YOLOv8 detector for the 04 model comparison (optional)
+
+# --- Utilities ---
+requests              # Used by the dataset downloader script
+tqdm                  # Nice progress bars

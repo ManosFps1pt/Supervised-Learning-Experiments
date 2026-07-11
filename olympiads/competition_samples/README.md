@@ -16,6 +16,7 @@ Use it as a practice selector, not as a reading library. The target is to turn p
 
 Downloaded:
 
+- Official IOAI 2026 sparse repository: three Home Task notebooks; task datasets remain externally hosted.
 - Official IOAI 2025 sparse repository: task/solution notebooks, README, license, requirements.
 - Official IOAI 2024 sparse repository: on-site notebooks and README.
 - Official IOAI 2024 direct zip assets from IOAI resources.
