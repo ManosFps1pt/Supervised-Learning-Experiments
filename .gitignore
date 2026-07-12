@@ -19,6 +19,7 @@ olympiads/competition_samples/raw/awesome-ioai-tasks/
 olympiads/competition_samples/raw/kazakhstan-tst-day*/
 olympiads/competition_samples/raw/romania-onia-examples/
 olympiads/competition_samples/raw/romania-roai-solved/
+olympiads/competition_samples/raw/ceoai-2026-practice-rounds/round-1/project_kraken/starter_kit/dataset/dataset/*.npy
 
 # Python
 __pycache__/
