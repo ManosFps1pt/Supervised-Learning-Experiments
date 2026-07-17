@@ -1,0 +1,8 @@
+Overcoming Catastrophic Forgetting in Neural Networks: https://arxiv.org/abs/1612.00796
+Embedding Watermarks into Deep Neural Networks: https://arxiv.org/abs/1701.04082
+Axiomatic Attribution for Deep Networks: https://arxiv.org/abs/1703.01365
+ERASER: A Benchmark to Evaluate Rationalized NLP Models: https://arxiv.org/abs/1911.03429
+The Disagreement Problem in Explainable Machine Learning: https://arxiv.org/abs/2202.01602
+DistilBERT model card: https://huggingface.co/distilbert/distilbert-base-uncased-finetuned-sst-2-english
+SST-2 dataset: https://huggingface.co/datasets/stanfordnlp/sst2
+https://arxiv.org/pdf/2304.07193
