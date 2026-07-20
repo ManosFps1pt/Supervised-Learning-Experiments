@@ -1,20 +1,56 @@
-# IOAI / CEOAI Practice Environment
+# IOAI Practice Environment
 
-Date checked: 2026-06-30
+Date checked: 2026-07-19
 
 ## Current Target
 
-Use IOAI 2026 as the primary environment target. Public CEOAI environment details are harder to verify, while IOAI publishes current contest rules and a technical appendix.
+Use IOAI 2026 as the primary environment target. CEOAI / EUROAI material remains
+useful practice, but the local setup should now mimic the official IOAI
+technical appendix as closely as possible.
 
-The IOAI 2026 appendix describes:
+The IOAI 2026 rules and technical appendix describe:
 
-- Python 3.13.
-- Yandex Contest for task statements, answers, submissions, and evaluation.
-- JupyterLab as the primary development platform.
-- VS Code as an offline code editor without direct GPU access.
-- Core Python ML libraries including NumPy, pandas, scikit-learn, PyTorch, torchvision, torchaudio, and common data/plotting/NLP/CV packages.
-- No internet access during contest sessions.
-- No AI-based code assistance during contest sessions.
+- Python 3.13 with exact package versions to be published before the contest.
+- Yandex Contest for task statements, datasets, submissions, and scores.
+- Web-based JupyterLab as the main development platform and GPU access route.
+- VS Code as an offline editor on contestant machines, without direct GPU access.
+- Ubuntu laptops without local GPUs.
+- GPU-enabled training/evaluation machines. Current appendix details mention
+  NVIDIA H200 141GB GPUs split into 7 MIG slices, with an 18GB VRAM limit.
+- Core AI/ML packages: `torch`, `torchvision`, `torchaudio`, `transformers`,
+  `accelerate`, `peft`, `trl`, `scikit-learn`, `xgboost`, `lightgbm`,
+  `catboost`, `sentence-transformers`, `datasets`, `evaluate`, `spacy`, `nltk`,
+  `gensim`, and `fasttext`.
+- Data/CV/plotting/utilities: `numpy`, `pandas`, `scipy`, `polars`,
+  `pyarrow`, `h5py`, `opencv-python`, `Pillow`, `scikit-image`,
+  `albumentations`, `matplotlib`, `seaborn`, `plotly`, `tqdm`, `joblib`,
+  `tensorboard`, `pytorch-lightning`, `pydantic`, and `pyyaml`.
+- TensorFlow and Keras are not available. Installing additional packages during
+  the contest is not permitted.
+- Whitelist-only internet access. No unrestricted browsing and no external
+  pretrained model downloads during the contest.
+- Only organizer-approved pretrained models may be used.
+- Expected evaluation limit: notebook runtime up to 20 minutes per task unless
+  the task statement says otherwise.
+- Expected submission limit: up to 60 submissions per task.
+
+## Provided LLM
+
+The Individual Contest provides an official LLM integrated into the contest
+platform:
+
+- Individual Contest: Gemma 3, at most 1000 output tokens per query.
+- GAITE Contest: Gemma 4, at most 2000 output tokens per query.
+- Exact model, context window, rate limits, and usage quotas will be announced
+  before the contest.
+
+External LLMs, coding agents, browser assistants, AI copilots, and external APIs
+including LLM APIs are prohibited unless a task statement explicitly allows
+them.
+
+Local Gemma practice is only an approximation. Use `google/gemma-3-4b-it` if
+hardware allows, otherwise `google/gemma-3-1b-it`. Always cap practice outputs
+with `max_new_tokens=1000` and manually verify the response.
 
 ## Local Setup
 
@@ -48,17 +84,48 @@ jupyter lab
 
 Use JupyterLab for most timed IOAI-style practice. It best matches the contest development environment, and its autocomplete is weaker than a full IDE. That explains why typing something like `tree.` may not show a rich `fit` suggestion panel.
 
-Use VS Code for larger local `.py` files, templates, and repo navigation. Keep AI extensions disabled for contest-style practice. If the goal is strict contest simulation, also avoid relying on rich IntelliSense.
+Use VS Code for larger local `.py` files, templates, and repo navigation. Keep AI extensions disabled for contest-style practice. If the goal is strict contest simulation, also avoid relying on rich IntelliSense. In the actual IOAI environment, VS Code is an offline editor and does not directly access GPUs.
 
 Anaconda is not the important target. It may look familiar because Anaconda often launches JupyterLab, but the practical thing to train is the JupyterLab workflow itself.
 
-## Nitro / CEOAI Note
+## Local Gemma Practice
 
-If CEOAI practice uses the Nitro development platform, treat it as a platform-specific contest wrapper unless official technical documentation says otherwise. The safest preparation path is:
+Install support packages:
 
-- Train in JupyterLab first.
-- Keep code portable and dependency-light.
-- Practice without internet and without AI suggestions.
-- Prefer explicit imports, shape checks, and small smoke tests because platform autocomplete may be limited.
+```powershell
+python -m pip install -U torch "transformers>=4.50.0" accelerate pillow sentencepiece
+```
 
-Add any official Nitro documentation links here once available.
+Notebook pattern:
+
+```python
+import torch
+from transformers import GenerationConfig, pipeline
+
+MODEL_ID = "google/gemma-3-4b-it"  # fallback: "google/gemma-3-1b-it"
+
+pipe = pipeline(
+    "text-generation",
+    model=MODEL_ID,
+    device_map="auto",
+    torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
+)
+
+config = GenerationConfig.from_pretrained(MODEL_ID)
+config.max_new_tokens = 1000
+config.do_sample = False
+
+messages = [
+    {
+        "role": "user",
+        "content": "I am debugging a PyTorch training loop. What shape checks should I run first?",
+    }
+]
+
+out = pipe(messages, return_full_text=False, generation_config=config)
+print(out[0]["generated_text"])
+```
+
+Use this for prompt discipline, API-discovery rehearsal, and debugging
+questions. Do not use it to replace your own baseline implementation during
+strict mock contests.

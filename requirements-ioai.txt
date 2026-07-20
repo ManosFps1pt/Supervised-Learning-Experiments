@@ -19,21 +19,37 @@ torchvision
 torchaudio
 torchinfo
 pytorch-lightning
+accelerate
+peft
+trl
 
 xgboost
 lightgbm
 catboost
 polars
 pyarrow
+h5py
 
 opencv-python
+pillow
+scikit-image
+albumentations
 transformers
+sentence-transformers
+datasets
+evaluate
 nltk
 spacy
 gensim
+fasttext
 
 tqdm
+joblib
+tensorboard
+pydantic
+pyyaml
 requests
 gdown
 openpyxl
 markitdown
+sentencepiece

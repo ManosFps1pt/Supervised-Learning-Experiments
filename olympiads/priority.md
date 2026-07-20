@@ -1,114 +1,97 @@
-# CEOAI Priority Handoff
+# IOAI Priority Handoff
 
 ## Status
 
-Current date: 2026-07-12. CEOAI starts 2026-07-14. Calendar days left: 2. Effective work days left excluding 2026-07-13: 1.
+Current date: 2026-07-19. IOAI 2026 arrival is 2026-08-02 in Astana. The last
+real study day is 2026-07-30 because 2026-07-31 is a no-study day and the user
+flies to Astana on 2026-08-01. Effective study days remaining after today: 11
+calendar mornings/evenings if used well.
 
-Pace since previous run: FAST. Overall status: still behind because there is only one usable work day left, but the last interval was a real recovery push. Target schedule: ahead for the immediate 2026-07-08 onward mixed-practice slot; behind overall because several artifacts are still shallow or low-score.
+Primary target: official IOAI 2026 Individual Contest preparation. CEOAI and
+regional tasks are now supporting practice only when they map clearly to
+`olympiads/ioai_syllabus.md`.
 
-Baseline used: automation memory entry `2026-07-12T08:06:55+03:00` plus prompt last-run timestamp `2026-07-12T05:03:52.306Z`, checked against files modified after `2026-07-12T08:03:52+03:00` Athens time.
+Competition constraints to keep active:
 
-Cumulative position: counted competition evidence now exists for Stochastic Rift, Trace Twins Part A, Panda MNIST, Broken BERT, Hungary model extension, Romania ONIA, Help BOBAI, Star Observatory local fixture, Project KRAKEN official-size baseline, IOAI Chicken Counting format/score baseline, IOAI Concepts zip baseline, and a Markov Maze RL drill. The biggest remaining direct gap is clustering/classical unsupervised practice, especially `kazakhstan_day2_player_clustering`.
-
-## New Since Previous Run
-
-- `olympiads/competition_samples/raw/ceoai-2026-practice-rounds/round-1/project_kraken/Project_KRAKEN_Baseline.ipynb`
-  - Evidence: 18 executed code cells, no saved notebook errors, train shapes `(12000, 3, 128, 128)` and `(12000, 1024, 2)`, subtask 1 MSE `0.01477`, subtask 2 macro F1 `0.7937`, subtask 3 RMSE `0.11397`, and 3,000 test items predicted.
-  - Syllabus: CEOAI `3(c)`, `5(a)`, `2(a)`.
-  - Competition pattern: multimodal feature extraction, baseline, metric routing, strict CSV generation.
-  - Verdict: counts. This passes the previous handoff gate.
-
-- `olympiads/competition_samples/raw/ceoai-2026-practice-rounds/round-1/project_kraken/submission.csv`
-  - Evidence: 9,000 rows, columns `subtaskID,datapointID,answer`, exactly 3,000 rows per subtask, 3,000 datapoints, no missing answers, subtask 1 semicolon-vector format checked, subtask 2 integer-like labels checked, subtask 3 numeric answers checked.
-  - Syllabus: CEOAI `3(c)`, `5(a)`, `2(a)`.
-  - Competition pattern: submission format, row-count validation, file validation.
-  - Verdict: counts strongly.
-
-- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Chicken_Counting/Chicken_Counting.ipynb`
-  - Evidence: 14 executed code cells, no saved notebook errors, training/eval ran, logged test score `0.368`, MSE `858.5911`, MAE `28.1888`.
-  - Syllabus: CEOAI `5(a)`, `5(b)`, `3(c)`.
-  - Competition pattern: CV model pipeline, metric, submission artifact.
-  - Verdict: counts only as weak baseline/format practice. Predictions are all-zero, so model quality is not competition-ready.
-
-- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Chicken_Counting/submission.npz`
-  - Evidence: arrays `pred_a` and `pred_b`, each shaped `(100, 1, 180, 320)`, dtype `float32`, no shape failure.
-  - Syllabus: CEOAI `5(a)`, `5(b)`.
-  - Competition pattern: array submission format validation.
-  - Verdict: counts for output contract, not for score improvement.
-
-- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/Concepts.ipynb`
-  - Evidence: 16 executed code cells, no saved errors, generated clue files and zip; saved score output is `0.0`.
-  - Syllabus: CEOAI `4(b)`, `4(c)`, `3(c)`.
-  - Competition pattern: NLP/embedding workflow, JSONL/zip submission.
-  - Verdict: counts as output-format exposure only. It is not a useful scoring solution yet.
-
-- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/out/submission.zip`
-  - Evidence: contains `clues_a.jsonl` with 50 lines and `clues_b.jsonl` with 100 lines.
-  - Syllabus: CEOAI `4(b)`, `4(c)`.
-  - Competition pattern: JSONL/zip output contract.
-  - Verdict: counts for file validation.
-
-- `olympiads/IOAI Material/7. Reinforcement Learning and AI Search/exercises/markov_maze_production_drill.ipynb`
-  - Evidence: 12 executed code cells, no saved errors, transition checks passed, value table checks passed, policy checks passed, and a submission-like CSV was written.
-  - Syllabus: CEOAI `1(d)`, `1(e)`, `1(f)`.
-  - Competition pattern: value/policy table, constraints, submission-like output.
-  - Verdict: counts. The source-copy notebook under `competition_samples/raw/.../markov_maze_production_drill.ipynb` still has a saved `NotImplementedError`, so use the clean exercise copy as the counted artifact.
+- Main development environment: web-based JupyterLab.
+- Secondary editor: VS Code offline, without direct GPU access.
+- Platform: Yandex Contest for statements, datasets, submissions, and scores.
+- Language/runtime: Python 3.13.
+- Individual Contest LLM: officially provided Gemma 3, at most 1000 output
+  tokens per query. External LLMs, coding agents, copilots, browser assistants,
+  and external APIs are prohibited unless a task statement explicitly allows
+  them.
+- Hardware expectation: Ubuntu laptops without local GPUs; GPU training and
+  evaluation through JupyterLab-backed training machines. Technical appendix
+  currently mentions NVIDIA H200 MIG slices with an 18GB VRAM limit.
+- Practice limit to simulate: 20-minute notebook runtime per task unless the
+  task says otherwise, and up to 60 submissions per task.
 
 ## Study Next
 
-Final-session override from 2026-07-12 evening: do not start a new full exercise by default tomorrow morning. The user has enough solved-task volume; the remaining highest-risk bottleneck is API discovery under time pressure.
+1. Official IOAI 2026 at-home / platform-familiarization task.
+   - Target: `olympiads/competition_samples/raw/IOAI-2026-sparse/Home Task/`
+     if assets are available.
+   - Syllabus: direct IOAI task-style practice across the official syllabus.
+   - Evidence: one executed notebook section, model/input/output shape checks,
+     one metric or scorer call, and one submission-format or artifact check.
+   - Why first: Contest 1 is connected to at-home tasks, so platform and task
+     pattern familiarity has unusually high value.
 
-1. Run the final API survival session.
-   - Target file: `olympiads/notes/ceoai_final_api_survival_session.md`
-   - Supporting file: `olympiads/recommended_materials_2026/MODEL_API_SURVIVAL.md`
-   - Syllabus pattern trained: library use across CEOAI `2`, `3`, `4`, and `5`.
-   - Competition pattern trained: unfamiliar object -> signature/docs -> tiny input -> output fields -> loss/metric/submission contract.
-   - Required visible evidence: open 2-3 old solved notebooks; for each, probe one unfamiliar sklearn/PyTorch/transformers/torchvision object with `dir`, `inspect.signature`, `help` or docstring, one tiny input, printed output keys/shapes, and one reload-style artifact check.
-   - Why highest-value next move: another exercise is unlikely to change readiness; a repeatable API-discovery protocol can prevent the most unpredictable failure mode.
-   - Stop condition: end when the protocol feels automatic, not when a new score is produced.
+2. Official IOAI past task replay.
+   - Targets: IOAI 2025 `Chicken_Counting` or `Concepts`, then IOAI 2024
+     `Help_BOBAI`.
+   - Evidence: baseline that is not only file-format-valid but has one measured
+     improvement or three inspected failure cases.
+   - Why second: past IOAI tasks teach the exact baseline -> validation ->
+     submission workflow better than generic tutorials.
 
-2. Optional only if calm and the API session is complete: Kazakhstan Day 2 Player Clustering.
-   - Target file: `olympiads/competition_samples/raw/kazakhstan-tst-day2/solution.ipynb`
-   - Reason to defer: it remains the clearest artifact gap, but starting it tomorrow morning is lower value than API survival if time or focus is limited.
+3. Missing IOAI syllabus practicals.
+   - Priority order: transformers/text encoders, object detection, segmentation,
+     pretrained vision encoders, CLIP/vision-text encoders, audio encoders,
+     autoencoders/GANs/diffusion.
+   - Evidence: a small notebook cell block per topic with input contract,
+     output contract, metric or visual sanity check, and when-to-use note.
 
-## Pass/Fail Check Before Next Run
+4. Gemma 3 contest-assistance rehearsal.
+   - Use a local Gemma model only as an approximation; the real contest LLM is
+     integrated into the IOAI platform.
+   - Practice with `max_new_tokens=1000`, short prompts, and manual
+     verification. Do not let the local model write full solutions during mock
+     contests.
+   - Evidence: one prompt, the checked answer, and a note on what was useful or
+     misleading.
 
-PASS: the user has rehearsed the API-survival protocol against 2-3 old solved notebooks, including `dir`, `inspect.signature`, `help` or docstring, tiny input, output keys/shapes, and a reload-style artifact check.
+## Daily Pass/Fail Check
 
-STRETCH PASS: Kazakhstan Day 2 has an executed clustering notebook, saved cluster labels or submission CSV, cluster-count justification, cluster-size sanity table/plot, and disk-level file validation.
+PASS: the day produced an IOAI-visible artifact: executed notebook cells,
+metric table, prediction/submission file, model-output sanity check, 20-minute
+runtime check, syllabus coverage row, or checked Gemma-3 prompt reflection.
 
-FAIL: the final session becomes passive reading, broad theory review, or a new exercise that does not improve API discovery.
+STRETCH PASS: the artifact maps to a named row in `olympiads/ioai_syllabus.md`
+and includes a reusable debugging/reflex note.
 
-## Avoid Until This Is Done
+FAIL: the day became passive reading, broad theory review, link collection, or
+unsaved experimentation with no artifact.
 
-- Do not start another new official IOAI 2025 task.
-- Do not tune Project KRAKEN unless a validation bug appears; it now passes the previous gate.
-- Do not polish Concepts.
-- Do not redo Markov Maze in the raw source-copy notebook.
-- Do not touch audio; CEOAI excludes IOAI-only audio.
-- Do not collect more links or task cards.
-- Do not turn the final morning into passive documentation reading.
+## Avoid Until The Daily Artifact Exists
+
+- Do not reorganize historical PDTN or CEOAI files.
+- Do not read full official solutions before attempting a baseline.
+- Do not use Codex/Copilot/external LLM help during strict mock-contest blocks.
+- Do not tune models before validating data shape, metric direction, runtime,
+  and submission format.
+- Do not spend the last days implementing standard internals from scratch when
+  the IOAI syllabus marks a method as practice/library use.
 
 ## Evidence To Recheck
 
-- `olympiads/competition_samples/problem_pattern_analysis.md`
-- `olympiads/notes/ceoai_final_api_survival_session.md`
-- `olympiads/recommended_materials_2026/MODEL_API_SURVIVAL.md`
+- `olympiads/ioai_syllabus.md`
+- `olympiads/notes/ioai_ceoai_environment.md`
+- `olympiads/notes/ioai_contest_strategy.md`
 - `olympiads/competition_samples/practice_queue.md`
 - `olympiads/competition_samples/source_index.csv`
-- `olympiads/competition_samples/task_cards/kazakhstan_day2_player_clustering.md`
-- `olympiads/competition_samples/task_cards/ceoai_2026_practice1_project_kraken.md`
-- `olympiads/competition_samples/task_cards/ioai_2025_chicken_counting.md`
-- `olympiads/competition_samples/task_cards/ioai_2025_concepts.md`
-- `olympiads/competition_samples/task_cards/romania_markov_maze.md`
-- `olympiads/competition_samples/raw/kazakhstan-tst-day2/`
-- `olympiads/competition_samples/raw/ceoai-2026-practice-rounds/round-1/project_kraken/Project_KRAKEN_Baseline.ipynb`
-- `olympiads/competition_samples/raw/ceoai-2026-practice-rounds/round-1/project_kraken/submission.csv`
-- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Chicken_Counting/Chicken_Counting.ipynb`
-- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Chicken_Counting/submission.npz`
-- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/out/submission.zip`
-- `olympiads/IOAI Material/7. Reinforcement Learning and AI Search/exercises/markov_maze_production_drill.ipynb`
-- `olympiads/ceoai_syllabus.md`
-- `olympiads/ioai_syllabus.md`
-- `olympiads/schedule.csv`
+- `olympiads/competition_samples/raw/IOAI-2026-sparse/Home Task/`
+- `olympiads/competition_samples/raw/IOAI-2025-sparse/`
+- `olympiads/competition_samples/raw/IOAI-2024-sparse/`
 - `olympiads/reviews/error_journal.jsonl`

@@ -2,7 +2,9 @@
 
 ## Active Scope
 
-This folder is the active workspace for CEOAI / EUROAI / IOAI preparation.
+This folder is the active workspace for IOAI 2026 preparation. CEOAI / EUROAI
+material is useful regional practice, but IOAI is the primary target until the
+2026 IOAI contest is over.
 
 Treat all other repository folders as older PDTN reference material unless the user says otherwise.
 
@@ -72,14 +74,17 @@ Rules:
 
 ## Emergency Exam Mode
 
-When the user is close to CEOAI/IOAI and asks about preparation, default to
+When the user is close to IOAI/CEOAI and asks about preparation, default to
 exam-maximizing behavior instead of general AI learning.
 
 Rules:
 
-- Treat direct syllabus coverage as the main metric.
+- Treat direct IOAI syllabus coverage as the main metric.
 - Read `priority.md` first when deciding what the user should study next. It is
-  the scheduled CEOAI coach's current handoff for other chats.
+  the scheduled IOAI coach's current handoff for other chats.
+- Calendar rule for IOAI 2026: study through 2026-07-30. The user cannot study
+  on 2026-07-31, and flies to Astana on 2026-08-01, so those two days are
+  rest, logistics, packing, and travel only.
 - Prefer past-task style practice, baselines, metrics, submissions, and
   debugging speed over deep theory.
 - Do not suggest from-scratch reimplementation of standard algorithms unless the
@@ -89,11 +94,17 @@ Rules:
 - Every study block should end with visible evidence: notebook cells, metrics,
   predictions, a submission file, a checked model output, or a syllabus coverage
   table.
+- Practice mainly in JupyterLab because it is the official main development
+  environment. VS Code is a secondary offline editor and should not be treated
+  as the GPU training interface.
+- Mock contests should disable AI coding assistants and avoid external LLMs,
+  copilots, unrestricted web browsing, and external APIs unless a task statement
+  explicitly permits them.
 - If the user asks "How is preparation going?", lead with whether they are
   behind relative to the remaining calendar days and syllabus coverage, not with
   encouragement or generic advice.
 - In a three-day sprint, a topic is not "studied" unless it maps to an explicit
-  CEOAI/IOAI syllabus item and produces an artifact.
+  IOAI syllabus item and produces an artifact.
 
 ## No-Code Coaching Rule
 
@@ -148,15 +159,14 @@ Partial local coverage:
 - Autoencoders, GANs, diffusion, CLIP, Whisper/audio: mentioned in syllabus but not yet covered as local exercises.
 - Object detection and segmentation: syllabus items exist, but no clear local practical notebooks yet.
 
-Missing or high-priority for CEOAI:
+Missing or high-priority for IOAI:
 
-- A* search and heuristics.
-- Minimax and alpha-beta pruning.
-- Monte Carlo methods.
-- Markov Decision Processes.
-- Temporal Difference learning.
-- Q-learning.
-- Dynamic-programming style RL examples such as value iteration and policy iteration.
+- Clean transformer/text-classification notebook using Hugging Face.
+- Pretrained encoders and fine-tuning / parameter-efficient fine-tuning.
+- Object detection and segmentation practical baselines.
+- Autoencoders, GANs, diffusion, CLIP / vision-text encoders, and audio models.
+- Gemma-3-style prompt discipline under a 1000-output-token cap.
+- Submission validation, 20-minute runtime checks, and limited-docs practice.
 
 ## Recommended Future Structure
 
