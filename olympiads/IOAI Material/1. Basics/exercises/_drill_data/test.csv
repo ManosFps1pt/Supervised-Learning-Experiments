@@ -1,0 +1,5 @@
+sample_id,team,age,height_cm,score,hours,device
+t001,red,15,171,83.0,6.5,laptop
+t002,blue,17,169,61.0,3.0,tablet
+t003,green,16,177,,5.0,phone
+t004,red,19,184,74.0,4.0,laptop

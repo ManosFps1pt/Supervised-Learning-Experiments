@@ -1,0 +1,5 @@
+{"user": "u1", "event": "view", "value": 1}
+{"user": "u1", "event": "click", "value": 3}
+{"user": "u2", "event": "view", "value": 1}
+{"user": "u3", "event": "view", "value": 1}
+{"user": "u2", "event": "click", "value": 2}

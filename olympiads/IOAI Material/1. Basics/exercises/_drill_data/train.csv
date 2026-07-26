@@ -1,0 +1,13 @@
+sample_id,team,age,height_cm,score,hours,device,label
+s001,red,15,172,88.0,7.5,laptop,1
+s002,blue,16,168,71.0,4.0,tablet,0
+s003,red,15,181,93.0,8.0,laptop,1
+s004,green,17,159,55.0,2.0,phone,0
+s005,blue,16,175,,5.5,laptop,1
+s006,green,18,190,42.0,1.0,tablet,0
+s007,red,14,165,77.0,6.0,phone,1
+s008,blue,19,210,64.0,3.5,laptop,0
+s009,green,17,170,81.0,7.0,tablet,1
+s010,red,18,178,69.0,4.5,laptop,0
+s011,blue,15,162,90.0,8.5,phone,1
+s012,green,16,174,59.0,2.5,tablet,0

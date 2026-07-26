@@ -1,0 +1,5 @@
+FROM gemma3:4b
+
+PARAMETER num_ctx 3000
+PARAMETER num_predict 1000
+PARAMETER temperature 0

@@ -13,6 +13,7 @@ Treat all other repository folders as older PDTN reference material unless the u
 Key local files:
 
 - `ioai_syllabus.md`: local copy/extraction of the IOAI 2026 syllabus.
+- `aicc/aicc_problem_corpus.md`: the local, searchable index of all 27 AICC tasks as of 2026-07-24, including verified prompt, task type, IOAI-syllabus mapping, and official platform link. For a non-official exercise, search this corpus first; once a title is selected, use the `aicc-problem-importer` to create `aicc/<slug>/` with the dataset/baseline/prompt instead of re-researching the AICC site.
 - `ceoai_syllabus.md`: local CEOAI topic list.
 - `IOAI Material/1. Basics/sources/L01.ipynb`: strong basics notebook covering vectorization, NumPy, pandas, metrics, sklearn, and small PyTorch patterns.
 - `IOAI Material/2. (Mostly) Linear models/sources/L02c - Support Vector Machines (TBA).docx`: currently only a placeholder.

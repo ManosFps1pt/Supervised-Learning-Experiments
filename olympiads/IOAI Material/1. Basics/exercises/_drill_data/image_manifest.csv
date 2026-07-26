@@ -1,0 +1,9 @@
+image_id,mask_id,label,shape,x1,y1,x2,y2
+img_000.png,mask_000.png,0,square,8,8,31,31
+img_001.png,mask_001.png,1,circle,16,10,43,37
+img_002.png,mask_002.png,0,square,4,16,27,43
+img_003.png,mask_003.png,1,circle,20,18,47,45
+img_004.png,mask_004.png,0,square,12,4,39,31
+img_005.png,mask_005.png,1,circle,10,20,37,47
+img_006.png,mask_006.png,0,square,18,8,45,35
+img_007.png,mask_007.png,1,circle,6,6,35,35

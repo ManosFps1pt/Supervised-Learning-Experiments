@@ -1,0 +1,72 @@
+[
+  {
+    "id": "r001",
+    "label": "cat",
+    "meta": {
+      "score": 0.82,
+      "size": [
+        32,
+        32
+      ]
+    },
+    "tags": [
+      "small",
+      "fur"
+    ]
+  },
+  {
+    "id": "r002",
+    "label": "dog",
+    "meta": {
+      "score": 0.55,
+      "size": [
+        48,
+        32
+      ]
+    },
+    "tags": [
+      "fur"
+    ]
+  },
+  {
+    "id": "r003",
+    "label": "cat",
+    "meta": {
+      "score": 0.91,
+      "size": [
+        40,
+        40
+      ]
+    },
+    "tags": [
+      "small",
+      "indoor"
+    ]
+  },
+  {
+    "id": "r004",
+    "label": "bird",
+    "meta": {
+      "score": 0.37,
+      "size": [
+        24,
+        24
+      ]
+    },
+    "tags": []
+  },
+  {
+    "id": "r005",
+    "label": "dog",
+    "meta": {
+      "score": 0.73,
+      "size": [
+        64,
+        48
+      ]
+    },
+    "tags": [
+      "outdoor"
+    ]
+  }
+]
