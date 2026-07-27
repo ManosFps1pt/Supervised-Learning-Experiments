@@ -1,13 +1,12 @@
 # Polarity Reference Solution
 
-Status: TODO
+Status: downloaded as official GitHub notebook; AICC markdown editorial page not published.
 
-## Source
+## Sources
 
-- AICC/problem page: https://aicc-official.org/contests
-- Kaggle competition: https://www.kaggle.com/competitions/polarity-aicc-round-7
-- Editorial/reference solution URL: TODO
+- AICC contests page: https://aicc-official.org/contests
+- Official GitHub notebook: https://github.com/AI-Community-Contest/solutions/blob/main/round-7/polarity.ipynb
+- Local GitHub notebook copy: `source/polarity-reference-solution.ipynb`
 
-## Notes
+Checked source: the live AICC frontend bundle lists Polarity with `solution: "https://github.com/AI-Community-Contest/solutions/blob/main/round-7/polarity.ipynb"` and no `blog`/MDX route.
 
-TODO: Download the official AICC editorial/reference solution markdown when available. If blocked, missing, or not yet published, replace this section with the exact URL/page/command checked and the blocker.

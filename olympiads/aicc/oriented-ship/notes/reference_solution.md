@@ -1,13 +1,11 @@
 # Oriented Ship Reference Solution
 
-Status: TODO
+Status: not-yet-published.
 
-## Source
+## Sources Checked
 
-- AICC/problem page: https://aicc-official.org/contests
+- AICC contests page: https://aicc-official.org/contests
 - Kaggle competition: https://www.kaggle.com/competitions/oriented-ship-aicc-round-7
-- Editorial/reference solution URL: TODO
 
-## Notes
+Checked source: the live AICC frontend bundle lists Oriented Ship with `solution: "todo"`. No AICC markdown editorial page or official GitHub reference notebook is currently published.
 
-TODO: Download the official AICC editorial/reference solution markdown when available. If blocked, missing, or not yet published, replace this section with the exact URL/page/command checked and the blocker.

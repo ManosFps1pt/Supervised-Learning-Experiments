@@ -21,6 +21,13 @@ olympiads/competition_samples/raw/romania-onia-examples/
 olympiads/competition_samples/raw/romania-roai-solved/
 olympiads/competition_samples/raw/ceoai-2026-practice-rounds/round-1/project_kraken/starter_kit/dataset/dataset/*.npy
 
+# Portable IOAI task-local downloads and generated artifacts
+olympiads/portable_ioai/**/.data/
+olympiads/portable_ioai/**/.cache/
+olympiads/portable_ioai/**/.downloads/
+olympiads/portable_ioai/**/outputs/
+olympiads/portable_ioai/smoke-results/
+
 # Python
 __pycache__/
 .mypy_cache/

@@ -1,13 +1,13 @@
 # Find Brain Tumors Reference Solution
 
-Status: TODO
+Status: downloaded.
 
-## Source
+## Sources
 
-- AICC/problem page: https://aicc-official.org/contests
-- Kaggle competition: https://www.kaggle.com/competitions/aicc-round-0-brain-tumor
-- Editorial/reference solution URL: TODO
+- AICC editorial page: https://aicc-official.org/solutions/round-0/find-brain-tumors
+- AICC compiled editorial bundle: `source/find-brain-tumors-editorial.js`
+- Official GitHub notebook: https://github.com/AI-Community-Contest/solutions/blob/main/round-0/brain-tumors.ipynb
+- Local GitHub notebook copy: `source/brain-tumors-reference-solution.ipynb`
 
-## Notes
+Note: AICC publishes the web editorial as compiled MDX JavaScript in the frontend bundle, not as raw Markdown. The compiled editorial bundle is preserved in `source/`.
 
-TODO: Download the official AICC editorial/reference solution markdown when available. If blocked, missing, or not yet published, replace this section with the exact URL/page/command checked and the blocker.

@@ -1,22 +1,32 @@
 # Oriented Ship Overview
 
-TODO: Paste the actual exercise prompt/task statement from the official platform page.
-
 ## Source
 
-- AICC/problem URL: https://aicc-official.org/contests
-- Kaggle URL: https://www.kaggle.com/competitions/oriented-ship-aicc-round-7
-- Platform: Kaggle
-- Contest: AICC Round 7
+- Kaggle: https://www.kaggle.com/competitions/oriented-ship-aicc-round-7
+- Baseline notebook: https://www.kaggle.com/code/nikolasgegenava/baseline-oriented-ships-aicc-round-7
+- AICC solution status: coming soon
 
 ## Task Statement
 
-TODO
+Detect ships in aerial imagery with rotated bounding boxes `(cx, cy, w, h, theta)`.
+
+Restrictions from the corpus/task listing: standard ImageNet backbones are allowed, but maritime data and oriented-detection pretraining are not.
+
+## Data
+
+- `Oriented/images/train/`
+- `Oriented/images/val/`
+- `Oriented/labels/`
 
 ## Evaluation
 
-TODO
+mAP@0.5 with rotated IoU.
 
 ## Submission Format
 
-TODO
+Submit each image's confidence-ranked rotated boxes in the format expected by the Kaggle baseline/task page.
+
+## Import Status
+
+Dataset downloaded and extracted. Baseline downloaded. Reference solution is not yet published by AICC.
+

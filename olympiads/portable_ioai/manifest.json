@@ -1,0 +1,543 @@
+{
+  "schema_version": 1,
+  "generated_for": "IOAI 2026 travel laptop",
+  "python": "3.12",
+  "kernel": "portable-ioai",
+  "upstreams": {
+    "ioai_2024": {
+      "repository": "https://github.com/IOAI-official/IOAI-2024",
+      "commit": "d04f1df7662252e9e1912fd473a3ea884147c2a5"
+    },
+    "ioai_2025": {
+      "repository": "https://github.com/IOAI-official/IOAI-2025",
+      "commit": "39558e9a639d170bd92de91958fcdc915f670463"
+    },
+    "ioai_2026": {
+      "repository": "https://github.com/IOAI-official/IOAI-2026",
+      "commit": "4d02a6dfc8b4fb9eebdc6cbe098e203ee5506482"
+    }
+  },
+  "tasks": {
+    "home_task_1": {
+      "title": "IOAI 2026 Home Task 1 — Operation Night Watch",
+      "notebook": "tasks/home_task_1/Home-Task-1.ipynb",
+      "source": {
+        "upstream": "ioai_2026",
+        "path": "Home Task/Home-Task-1.ipynb",
+        "local_working_copy": "../competition_samples/raw/IOAI-2026-sparse/Home Task/problem1/Home-Task-1.ipynb"
+      },
+      "data_environment": "PORTABLE_IOAI_HOME_TASK_1_DATA",
+      "minimum_free_bytes": 4294967296,
+      "bootstrap": {
+        "kind": "google_drive_zip",
+        "file_ids": [
+          "12XaRWYDsHq3eBwrgZ0QnEOffflS_dlff",
+          "1iUYDtKxXM1GSG5VNJ3r9847hqhWEiQRq",
+          "112F9IFfn3_UtOPwSM1cGbuAL7Ci2aBP_"
+        ],
+        "file_urls": [
+          "https://drive.google.com/uc?id=12XaRWYDsHq3eBwrgZ0QnEOffflS_dlff",
+          "https://drive.google.com/uc?id=1iUYDtKxXM1GSG5VNJ3r9847hqhWEiQRq",
+          "https://drive.google.com/uc?id=112F9IFfn3_UtOPwSM1cGbuAL7Ci2aBP_"
+        ],
+        "archive": {
+          "name": "dataset.zip",
+          "bytes": 1508471337,
+          "sha256": "10742c5d31059f797bfa15e8c730404dec43e2dd00c14769fe5560d11e2a492a",
+          "uncompressed_bytes": 2028763704
+        }
+      },
+      "assets": [
+        {
+          "path": "train.csv",
+          "bytes": 21303,
+          "sha256": "ca06acaa26cf8406974a3ad712dcc9e80c792ad2bc634672e85cc181287d807f"
+        },
+        {
+          "path": "fine_tune.csv",
+          "bytes": 38713,
+          "sha256": "83b190d6a1fcf72fdb1487c88f7e69239c93d4639c4fc92fbf5e1416577ae279"
+        },
+        {
+          "path": "model/config.json",
+          "bytes": 1279,
+          "sha256": "c7c5c83daf3c8df182e3adab55c5c90229328d8e66527b4fe38576936a97860c"
+        },
+        {
+          "path": "model/model.safetensors",
+          "bytes": 344833112,
+          "sha256": "8bc0c8246218cf5b9da26ca468f2a4770afc5ba978b170f3a14d335e56af554b"
+        },
+        {
+          "path": "model/preprocessor_config.json",
+          "bytes": 297,
+          "sha256": "8d04ba5a9c6fca5d39d0de2b1fd05ecf79deb589fbba279728bbebac39934231"
+        },
+        {
+          "path": "model/training_args.bin",
+          "bytes": 5201,
+          "sha256": "e4e7df36765b172ff98dc763893c5085639418ec0a7e95aac02caddd4d90031b"
+        }
+      ],
+      "contracts": {
+        "train_rows": 491,
+        "fine_tune_rows": 792,
+        "referenced_wav_files": 1283,
+        "sample_rate": 16000,
+        "feature_shape": [
+          1,
+          1024,
+          128
+        ],
+        "logits_shape": [
+          1,
+          16
+        ]
+      },
+      "smoke": {
+        "audio_files": 1,
+        "model_forwards": 1,
+        "device": "cpu"
+      },
+      "dependencies": [
+        "librosa",
+        "numpy",
+        "pandas",
+        "scikit-learn",
+        "torch",
+        "transformers"
+      ]
+    },
+    "home_task_2": {
+      "title": "IOAI 2026 Home Task 2 — Robot Delivery Academy",
+      "notebook": "tasks/home_task_2/Home-Task-2.ipynb",
+      "source": {
+        "upstream": "ioai_2026",
+        "path": "Home Task/Home-Task-2.ipynb",
+        "local_working_copy": "../competition_samples/raw/IOAI-2026-sparse/Home Task/problem2/Home-Task-2.ipynb"
+      },
+      "data_environment": "PORTABLE_IOAI_HOME_TASK_2_DATA",
+      "minimum_free_bytes": 25000000,
+      "bootstrap": {
+        "kind": "google_drive_folder",
+        "folder_id": "1DXFDoY9bqulMBFacyDShVIx8Sa7Z5Wpa",
+        "folder_url": "https://drive.google.com/drive/folders/1DXFDoY9bqulMBFacyDShVIx8Sa7Z5Wpa"
+      },
+      "assets": [
+        {
+          "path": "train_demos.pkl",
+          "bytes": 9192058,
+          "sha256": "a56eedb8c06279a1e99e0dadc51c736154e453dd21a27000892a92a1560c90d9"
+        },
+        {
+          "path": "valid_scenarios.pkl",
+          "bytes": 14833,
+          "sha256": "44f62c0dde7e6c5185f6c33f0c28a908427f5748489e1079cd36a1452615a9f7"
+        },
+        {
+          "path": "test_scenarios.pkl",
+          "bytes": 119444,
+          "sha256": "227260b1245b23886deb9fd78f56a45b24cce9630e6c80a239ec489212a2bf5f"
+        }
+      ],
+      "contracts": {
+        "trajectories": 400,
+        "state_action_samples": 5327,
+        "valid_scenarios": 200,
+        "test_scenarios": 1600,
+        "grid_shape": [
+          6,
+          8,
+          8
+        ],
+        "vector_shape": [
+          13
+        ],
+        "action_mask_shape": [
+          6
+        ],
+        "flattened_features": 397,
+        "actions": 6
+      },
+      "smoke": {
+        "training_samples": 1,
+        "optimizer_steps": 1,
+        "rollout_steps": 1,
+        "device": "cpu"
+      },
+      "dependencies": [
+        "gdown",
+        "numpy",
+        "pillow",
+        "torch"
+      ]
+    },
+    "home_task_3": {
+      "title": "IOAI 2026 Home Task 3 — The Analytical Language of John Wilkins",
+      "notebook": "tasks/home_task_3/Home-Task-3.ipynb",
+      "source": {
+        "upstream": "ioai_2026",
+        "path": "Home Task/Home-Task-3.ipynb",
+        "local_working_copy": "../competition_samples/raw/IOAI-2026-sparse/Home Task/problem3/Home-Task-3.ipynb"
+      },
+      "data_environment": "PORTABLE_IOAI_HOME_TASK_3_DATA",
+      "minimum_free_bytes": 1800000000,
+      "bootstrap": {
+        "kind": "google_drive_folder",
+        "folder_id": "1YheHvGfQw5YUa7MjdUF0hQC4sdtLZ5UC",
+        "folder_url": "https://drive.google.com/drive/folders/1YheHvGfQw5YUa7MjdUF0hQC4sdtLZ5UC"
+      },
+      "assets": [
+        {
+          "path": "animals_pool.txt",
+          "bytes": 16570,
+          "sha256": "87eb93cc5d2a238a38daaeb201c394db935153cc17b03a44a7642f0db9ff35dc"
+        },
+        {
+          "path": "questions_pool.txt",
+          "bytes": 15214,
+          "sha256": "d2bd060866382f3dd1329112e73fbd6bf2397352d02469434b7b3d199bd2ca62"
+        },
+        {
+          "path": "dev.csv",
+          "bytes": 1820,
+          "sha256": "4fe11ff86f2cc3476f3533b4aa006fc016fd1bc7fbae4b15987df6add75b907c"
+        },
+        {
+          "path": "test1.csv",
+          "bytes": 6124,
+          "sha256": "cf67700b8af26c2a88b6d1866c4837f73bcc2daf84eea075bd69723824fd5f4c"
+        }
+      ],
+      "support": [
+        {
+          "path": "support/interactor.py",
+          "upstream_sha256": "199395875150a21ed0afa9470a676141c64712385a5cb80fb37c6147c4693d4b",
+          "sha256_lf": "6b1710a1e13f10533e62ccc32e1e21d6e4cf20fc6fdee4e3ad4dd128cefde1ac"
+        },
+        {
+          "path": "support/evaluate.py",
+          "upstream_sha256": "20f6961958659c22c15683a8f2c5b3ab47da244cac56867e369c8e8d37e81bfd",
+          "sha256_lf": "98ac4206424beaea3cbcedfa5b7cacef137e7d6ae6cff55ae33eed569d6a97bf"
+        }
+      ],
+      "models": {
+        "full": {
+          "id": "Qwen/Qwen2.5-3B-Instruct",
+          "revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1"
+        },
+        "smoke": {
+          "id": "Qwen/Qwen2.5-0.5B-Instruct",
+          "revision": "a338b55dd21219a5f4da42bc11a9313d1a27d4cc"
+        }
+      },
+      "contracts": {
+        "animals": 1472,
+        "questions": 559,
+        "dev_rows": 150,
+        "test1_rows": 500,
+        "smoke_questions": 1
+      },
+      "smoke": {
+        "interactors": 1,
+        "questions": 1,
+        "model": "smoke",
+        "device": "cpu"
+      },
+      "dependencies": [
+        "accelerate",
+        "numpy",
+        "pandas",
+        "torch",
+        "transformers"
+      ]
+    },
+    "chicken_counting": {
+      "title": "IOAI 2025 Chicken Counting",
+      "notebook": "tasks/chicken_counting/Chicken_Counting.ipynb",
+      "source": {
+        "upstream": "ioai_2025",
+        "path": "Individual-Contest/Chicken_Counting/Chicken_Counting.ipynb",
+        "local_working_copy": "../competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Chicken_Counting/Chicken_Counting.ipynb"
+      },
+      "data_environment": "PORTABLE_IOAI_CHICKEN_COUNTING_DATA",
+      "minimum_free_bytes": 2147483648,
+      "bootstrap": {
+        "kind": "http_assets"
+      },
+      "assets": [
+        {
+          "path": "base.pth",
+          "bytes": 1042939,
+          "sha256": "2e5077f2b97360a93f1dd6aa2c46801fbe7e77bd4681494f5e81ede22240cc13",
+          "url": "https://raw.githubusercontent.com/IOAI-official/IOAI-2025/39558e9a639d170bd92de91958fcdc915f670463/Individual-Contest/Chicken_Counting/base.pth"
+        }
+      ],
+      "datasets": [
+        {
+          "name": "train",
+          "id": "ioaihsc/Task2_Chicken_Counting_Train2",
+          "revision": "377f01f034683afc5a49468001e75360af722393",
+          "data_dir": "train",
+          "split": "train",
+          "rows": 100,
+          "remote_file": {
+            "path": "train/train-00000-of-00001.parquet",
+            "bytes": 177669319,
+            "sha256": "6da029f7bef71942607506b1d180a6aaab7a6a927cd008ebf29200e6932936c5"
+          }
+        },
+        {
+          "name": "validation",
+          "id": "ioaihsc/Task2_Chicken_Counting_Test",
+          "revision": "decfcd957868ace7595df19638b04b0fe9deafbe",
+          "data_dir": "valandtest",
+          "split": "validation",
+          "rows": 100,
+          "remote_file": {
+            "path": "valandtest/validation-00000-of-00001.parquet",
+            "bytes": 167145255,
+            "sha256": "b725b6bf83446cd370dd0ec5aae22d7e2963f23b698ebcb9ad6bdae524812d26"
+          }
+        },
+        {
+          "name": "test",
+          "id": "ioaihsc/Task2_Chicken_Counting_Test",
+          "revision": "decfcd957868ace7595df19638b04b0fe9deafbe",
+          "data_dir": "valandtest",
+          "split": "test",
+          "rows": 100,
+          "remote_file": {
+            "path": "valandtest/test-00000-of-00001.parquet",
+            "bytes": 167858657,
+            "sha256": "b67dae0c86aca38b2b8f78666e63aefb86813d81a19ae140d1b1431c71a62bff"
+          }
+        }
+      ],
+      "support": [
+        {
+          "path": "support/metrics.py",
+          "upstream_sha256": "77527c90b4689d67bb2929ccd1bfe22256932e54f288301cf1ebaa916c43f6eb",
+          "sha256_lf": "5ce86bfedfde6dcee4141bc797e9eef7244a07c0aa4f8ec1939dc75ccf7a4aff"
+        }
+      ],
+      "contracts": {
+        "image_shape": [
+          3,
+          720,
+          1280
+        ],
+        "density_shape": [
+          1,
+          180,
+          320
+        ],
+        "model_output_shape": [
+          1,
+          1,
+          180,
+          320
+        ],
+        "weight_tensors": 8
+      },
+      "smoke": {
+        "dataset_samples": 1,
+        "crop_shape": [
+          3,
+          128,
+          128
+        ],
+        "model_forwards": 1,
+        "device": "cpu"
+      },
+      "dependencies": [
+        "datasets",
+        "numpy",
+        "pillow",
+        "torch",
+        "torchvision"
+      ]
+    },
+    "concepts_cpu": {
+      "title": "IOAI 2025 Concepts — portable CPU embedding baseline",
+      "notebook": "tasks/concepts_cpu/Concepts_CPU.ipynb",
+      "source": {
+        "upstream": "ioai_2025",
+        "path": "Individual-Contest/Concepts/Concepts_baseline.ipynb",
+        "local_working_copy": "../competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/Concepts_baseline-Copy1.ipynb"
+      },
+      "data_environment": "PORTABLE_IOAI_CONCEPTS_DATA",
+      "minimum_free_bytes": 500000000,
+      "bootstrap": {
+        "kind": "hugging_face"
+      },
+      "datasets": [
+        {
+          "name": "hint_descriptions",
+          "id": "IOAI-official/ioai2025-onsite-concepts-hint-descriptions",
+          "revision": "ae1d57bf4668610ea927599ebac2c46e80bfd120",
+          "split": "train",
+          "rows": 118,
+          "remote_file": {
+            "path": "data/train-00000-of-00001.parquet",
+            "bytes": 418301,
+            "sha256": "425bf72b63af994aeff8cf8a1942477bf764f670bfe7c21a7790f452126ac882"
+          }
+        },
+        {
+          "name": "train",
+          "id": "IOAI-official/ioai2025-onsite-concepts-train",
+          "revision": "40e6b2b6b17ff53a6653dd435e5af2ecde3f5622",
+          "split": "train",
+          "rows": 30,
+          "remote_file": {
+            "path": "data/train-00000-of-00001.parquet",
+            "bytes": 15301,
+            "sha256": "ceac1a6a15c24297db3e8f46b8a0adc31ca7c1adb59030937c00b3f075f70dae"
+          }
+        },
+        {
+          "name": "validation",
+          "id": "IOAI-official/ioai2025-onsite-concepts-validation",
+          "revision": "2ab5769aef2cc2a4c34c9480c7318f287a5ad119",
+          "split": "test",
+          "rows": 50,
+          "remote_file": {
+            "path": "data/test-00000-of-00001.parquet",
+            "bytes": 23892,
+            "sha256": "ca56366339e1773379e3e2dd8389be060782873b9971e180d052bd7993629dd3"
+          }
+        },
+        {
+          "name": "test",
+          "id": "IOAI-official/ioai2025-onsite-concepts-test",
+          "revision": "a2d38cbee48c98d115002eb01d45349c8d95503f",
+          "split": "test",
+          "rows": 100,
+          "remote_file": {
+            "path": "data/test-00000-of-00001.parquet",
+            "bytes": 38090,
+            "sha256": "6ea062e55cb736cee5a5c7523c5e70447fc76c281d9ba07efad729bf515016aa"
+          }
+        }
+      ],
+      "models": {
+        "embedding": {
+          "id": "sentence-transformers/all-MiniLM-L6-v2",
+          "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+          "dimensions": 384
+        }
+      },
+      "contracts": {
+        "hint_ids": [
+          0,
+          117
+        ],
+        "clue_sequences": [
+          1,
+          4
+        ],
+        "ids_per_sequence": [
+          1,
+          8
+        ],
+        "smoke_jsonl_rows": 1
+      },
+      "smoke": {
+        "training_rows": 1,
+        "validation_rows": 1,
+        "test_rows": 1,
+        "jsonl_rows": 1,
+        "device": "cpu",
+        "paid_api": false
+      },
+      "optional": {
+        "openrouter_environment": "OPENROUTER_API_KEY",
+        "contest_proxy": "not part of the portability guarantee"
+      },
+      "dependencies": [
+        "datasets",
+        "numpy",
+        "pydantic",
+        "scikit-learn",
+        "sentence-transformers",
+        "torch"
+      ]
+    },
+    "help_bobai": {
+      "title": "IOAI 2024 Help BOBAI",
+      "notebook": "tasks/help_bobai/Help_BOBAI.ipynb",
+      "source": {
+        "upstream": "ioai_2024",
+        "path": "On-Site-Round/Help_BOBAI/Help_BOBAI.ipynb",
+        "local_working_copy": "../competition_samples/raw/IOAI-2024-sparse/On-Site-Round/Help_BOBAI/Help_BOBAI.ipynb"
+      },
+      "data_environment": "PORTABLE_IOAI_HELP_BOBAI_DATA",
+      "minimum_free_bytes": 25000000,
+      "bootstrap": {
+        "kind": "http_assets"
+      },
+      "assets": [
+        {
+          "path": "training_set/base_classifier.pth",
+          "bytes": 16904,
+          "sha256": "6144fa2a448b19fceb864cdf203e72eb785540a68541ed571d48dd00d7d161f7",
+          "url": "https://raw.githubusercontent.com/IOAI-official/IOAI-2024/d04f1df7662252e9e1912fd473a3ea884147c2a5/On-Site-Round/Help_BOBAI/training_set/base_classifier.pth"
+        },
+        {
+          "path": "training_set/train-dev_dataset_with_labels.pt",
+          "bytes": 7608266,
+          "sha256": "ffb352fac3c6eeccbfe6aad7edf2765d1b77a954f1db8266b67ff8e19385ccdb",
+          "url": "https://raw.githubusercontent.com/IOAI-official/IOAI-2024/d04f1df7662252e9e1912fd473a3ea884147c2a5/On-Site-Round/Help_BOBAI/training_set/train-dev_dataset_with_labels.pt"
+        },
+        {
+          "path": "Solution/validation_set/eval_dataset.pt",
+          "bytes": 615605,
+          "sha256": "36464fd7dad081a5aa6a08ea4ab26977d79c85d30eaea74722a618f7b1cf1917",
+          "url": "https://raw.githubusercontent.com/IOAI-official/IOAI-2024/d04f1df7662252e9e1912fd473a3ea884147c2a5/On-Site-Round/Help_BOBAI/Solution/validation_set/eval_dataset.pt"
+        },
+        {
+          "path": "Solution/test_set/test_dataset.pt",
+          "bytes": 2151605,
+          "sha256": "8d766a4a5c3a570eec5ccdbe755d872c724c5fffc81a3d90323efc54ea2889eb",
+          "url": "https://raw.githubusercontent.com/IOAI-official/IOAI-2024/d04f1df7662252e9e1912fd473a3ea884147c2a5/On-Site-Round/Help_BOBAI/Solution/test_set/test_dataset.pt"
+        }
+      ],
+      "contracts": {
+        "training_shape": [
+          2473,
+          1,
+          769
+        ],
+        "validation_shape": [
+          200,
+          1,
+          768
+        ],
+        "test_shape": [
+          700,
+          1,
+          768
+        ],
+        "base_weight_shape": [
+          5,
+          768
+        ],
+        "prediction_classes": [
+          0,
+          6
+        ]
+      },
+      "smoke": {
+        "prediction_batch": 4,
+        "device": "cpu"
+      },
+      "dependencies": [
+        "numpy",
+        "pandas",
+        "scikit-learn",
+        "torch"
+      ]
+    }
+  }
+}

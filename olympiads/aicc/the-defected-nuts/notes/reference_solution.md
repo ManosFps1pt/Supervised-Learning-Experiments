@@ -1,13 +1,13 @@
 # The Defected Nuts Reference Solution
 
-Status: TODO
+Status: downloaded.
 
-## Source
+## Sources
 
-- AICC/problem page: https://aicc-official.org/contests
-- Kaggle competition: https://www.kaggle.com/competitions/the-defected-nuts-aicc-round-1-2
-- Editorial/reference solution URL: TODO
+- AICC editorial page: https://aicc-official.org/solutions/round-1/the-defected-nuts
+- AICC compiled editorial bundle: `source/the-defected-nuts-editorial.js`
+- Official GitHub notebook: https://github.com/AI-Community-Contest/solutions/blob/main/round-1/defected-nuts.ipynb
+- Local GitHub notebook copy: `source/defected-nuts-reference-solution.ipynb`
 
-## Notes
+Note: AICC publishes the web editorial as compiled MDX JavaScript in the frontend bundle, not as raw Markdown. The compiled editorial bundle is preserved in `source/`.
 
-TODO: Download the official AICC editorial/reference solution markdown when available. If blocked, missing, or not yet published, replace this section with the exact URL/page/command checked and the blocker.

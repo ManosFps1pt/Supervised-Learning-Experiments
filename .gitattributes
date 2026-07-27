@@ -1,0 +1,2 @@
+# Preserve exact exported notebook snapshots (including saved output evidence).
+olympiads/portable_ioai/**/*.ipynb -text

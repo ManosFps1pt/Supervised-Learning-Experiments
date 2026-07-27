@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "canonical_notebooks": [
+    {
+      "task": "home_task_1",
+      "source": "olympiads/competition_samples/raw/IOAI-2026-sparse/Home Task/problem1/Home-Task-1.ipynb",
+      "source_sha256": "fad9c4cb79cf92f5948e072b28d45dafb66803dd75dca2c5fc424c11d1c41fdf",
+      "destination": "olympiads/portable_ioai/tasks/home_task_1/Home-Task-1.ipynb",
+      "destination_sha256": "ba97b17ef183981f7020ab8d37e379eb8d79d8252c6936043de22108a2940fd0",
+      "bytes": 6933319,
+      "outputs_stripped": false
+    },
+    {
+      "task": "home_task_2",
+      "source": "olympiads/competition_samples/raw/IOAI-2026-sparse/Home Task/problem2/Home-Task-2.ipynb",
+      "source_sha256": "e58bb19ff93f2aec4e681e6122171948240ac333c7d8323da44c28d0470541e2",
+      "destination": "olympiads/portable_ioai/tasks/home_task_2/Home-Task-2.ipynb",
+      "destination_sha256": "2724e901491a6937e5571b139134bae96a2bae34ccf2d9cc9d11302548a0c186",
+      "bytes": 320165,
+      "outputs_stripped": false
+    },
+    {
+      "task": "home_task_3",
+      "source": "olympiads/competition_samples/raw/IOAI-2026-sparse/Home Task/problem3/Home-Task-3.ipynb",
+      "source_sha256": "ef7a3b7616ecd0e323bed8c592f383216921428f287cf09d68e0537e13def50a",
+      "destination": "olympiads/portable_ioai/tasks/home_task_3/Home-Task-3.ipynb",
+      "destination_sha256": "f13f025442fb40ab41b9d2ebb5e0beedad6e94be1a1d3fa4a300129a87d95f4f",
+      "bytes": 49213,
+      "outputs_stripped": false
+    },
+    {
+      "task": "chicken_counting",
+      "source": "olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Chicken_Counting/Chicken_Counting.ipynb",
+      "source_sha256": "82a5702e1a0287019a76b2fabb48e848cd44228fb0897dc775dd942bdbe5e949",
+      "destination": "olympiads/portable_ioai/tasks/chicken_counting/Chicken_Counting.ipynb",
+      "destination_sha256": "a7cade56b418e5adcd0f81335d92a4dedb6e2d559849f1a264b999cbeb199d31",
+      "bytes": 927191,
+      "outputs_stripped": false
+    },
+    {
+      "task": "concepts_cpu",
+      "source": "olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/Concepts_baseline-Copy1.ipynb",
+      "source_sha256": "6fd18101d417675004e1b39ad720d2bf70201501f54d98b155c491afa3282e98",
+      "destination": "olympiads/portable_ioai/tasks/concepts_cpu/Concepts_CPU.ipynb",
+      "destination_sha256": "5a42da01a6a5e4b1243e6c4a5a0bfb6a091629883199ad7ea67fb7ed66eb2def",
+      "bytes": 59919,
+      "outputs_stripped": false
+    },
+    {
+      "task": "help_bobai",
+      "source": "olympiads/competition_samples/raw/IOAI-2024-sparse/On-Site-Round/Help_BOBAI/Help_BOBAI.ipynb",
+      "source_sha256": "7f07a45ba8a6cbf69bd84a8f30e6af1e826e5d609701dec2a377997a802caa4b",
+      "destination": "olympiads/portable_ioai/tasks/help_bobai/Help_BOBAI.ipynb",
+      "destination_sha256": "19bc3b457cffa6deb479078d55776cf1691025d9e3ed4977b8bce827477947c4",
+      "bytes": 46164,
+      "outputs_stripped": false
+    }
+  ],
+  "reference_snapshot_count": 22,
+  "source_repository_count": 16
+}

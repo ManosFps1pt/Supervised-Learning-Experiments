@@ -2,44 +2,43 @@
 
 ## Source
 
-- AICC/problem page: [AICC page](https://aicc-official.org/contests)
-- Kaggle competition: [Kaggle](https://www.kaggle.com/competitions/essay-gap-aicc-round-2)
-- Raw AICC URL: https://aicc-official.org/contests
-- Raw Kaggle URL: https://www.kaggle.com/competitions/essay-gap-aicc-round-2
+- AICC/problem page: https://aicc-official.org/contests
+- Kaggle competition: https://www.kaggle.com/competitions/essay-gap-aicc-round-2
+- AICC editorial: https://aicc-official.org/solutions/round-2/essay-gap
 - Platform: Kaggle
 - Contest: AICC Round 2
 - Difficulty: easy
 
 ## Local Artifacts
 
-- Original notebook: TODO
-- Working notebook copy: TODO
-- Data directory: D:\projects\Supervised-Learning-Experiments\olympiads\aicc\essay-gap\data
-- Dataset status: TODO
+- Original notebook: `source/baseline-essay-gap-aicc-round-2.ipynb`
+- Working notebook copy: `notebooks/essay-gap_work.ipynb`
 - Reference solution: `notes/reference_solution.md`
-- Reference solution status: TODO
-- Submission script: `D:\projects\Supervised-Learning-Experiments\olympiads\aicc\essay-gap\submission_script.bat`
+- Data directory: `data/`
+- Dataset status: downloaded and extracted
+- Submission script: `submission_script.bat`
 
 ## Task Shape
 
-- Task type: NLP multiple-choice classification
-- Inputs: TODO
-- Outputs/submission format: TODO
-- Metric: TODO
+- Task type: NLP multiple-choice text coherence
+- Inputs: `before`, `after`, four options
+- Outputs/submission format: `sampleID,answer`
+- Metric: macro F1
 
 ## IOAI Syllabus Coverage
 
-- Primary coverage: TODO
-- Secondary coverage: TODO
-- Why this maps to the syllabus: TODO
+- Primary coverage: NLP Text Classification; Pre-trained Text Encoders; Transformers; Model Evaluation Metrics
+- Secondary coverage: Data Processing; tokenization
+- Competition pattern: option expansion, class-label contract, macro-F1 validation, clean CSV output
 
 ## Notebook Data-Flow Check
 
-- Installs packages: TODO
-- Downloads/prepares dataset: TODO
-- Manual download needed: TODO
-- Evidence: TODO
+- Installs packages: no
+- Downloads/prepares dataset: no
+- Manual download needed: no
+- Evidence: baseline reads train/test CSV paths; dataset exists under `data/essay-gap/`
 
 ## Next Action
 
-TODO
+Best first drill target among the five because the dataset is small and the task format is clean.
+

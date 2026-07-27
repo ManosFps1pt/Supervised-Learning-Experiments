@@ -2,44 +2,43 @@
 
 ## Source
 
-- AICC/problem page: [AICC page](https://aicc-official.org/contests)
-- Kaggle competition: [Kaggle](https://www.kaggle.com/competitions/the-defected-nuts-aicc-round-1-2)
-- Raw AICC URL: https://aicc-official.org/contests
-- Raw Kaggle URL: https://www.kaggle.com/competitions/the-defected-nuts-aicc-round-1-2
+- AICC/problem page: https://aicc-official.org/contests
+- Kaggle competition: https://www.kaggle.com/competitions/the-defected-nuts-aicc-round-1-2
+- AICC editorial: https://aicc-official.org/solutions/round-1/the-defected-nuts
 - Platform: Kaggle
 - Contest: AICC Round 1
 - Difficulty: hard
 
 ## Local Artifacts
 
-- Original notebook: TODO
-- Working notebook copy: TODO
-- Data directory: D:\projects\Supervised-Learning-Experiments\olympiads\aicc\the-defected-nuts\data
-- Dataset status: TODO
+- Original notebook: `source/baseline-the-defected-nuts-aicc-round-1.ipynb`
+- Working notebook copy: `notebooks/the-defected-nuts_work.ipynb`
 - Reference solution: `notes/reference_solution.md`
-- Reference solution status: TODO
-- Submission script: `D:\projects\Supervised-Learning-Experiments\olympiads\aicc\the-defected-nuts\submission_script.bat`
+- Data directory: `data/`
+- Dataset status: downloaded and extracted
+- Submission script: `submission_script.bat`
 
 ## Task Shape
 
-- Task type: CV anomaly segmentation
-- Inputs: TODO
-- Outputs/submission format: TODO
-- Metric: TODO
+- Task type: industrial anomaly segmentation
+- Inputs: clean train images and defect test images
+- Outputs/submission format: `submission.csv` with encoded anomaly masks
+- Metric: AUPRO
 
 ## IOAI Syllabus Coverage
 
-- Primary coverage: TODO
-- Secondary coverage: TODO
-- Why this maps to the syllabus: TODO
+- Primary coverage: Image Segmentation; Pre-trained Vision Encoders; Image Augmentation; Model Evaluation Metrics
+- Secondary coverage: Data Processing; Autoencoders as optional related method family
+- Competition pattern: segmentation mask contract, encoded submission validation, anomaly framing, high-resolution image handling
 
 ## Notebook Data-Flow Check
 
-- Installs packages: TODO
-- Downloads/prepares dataset: TODO
-- Manual download needed: TODO
-- Evidence: TODO
+- Installs packages: no
+- Downloads/prepares dataset: no
+- Manual download needed: no
+- Evidence: dataset exists under `data/data/`; baseline copy exists under `notebooks/`
 
 ## Next Action
 
-TODO
+Use for baseline-recognition drill after easier classification/NLP tasks; focus on identifying the first legal artifact and submission format.
+

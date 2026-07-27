@@ -1,22 +1,36 @@
 # Find Brain Tumors Overview
 
-TODO: Paste the actual exercise prompt/task statement from the official platform page.
-
 ## Source
 
-- AICC/problem URL: https://aicc-official.org/contests
-- Kaggle URL: https://www.kaggle.com/competitions/aicc-round-0-brain-tumor
-- Platform: Kaggle
-- Contest: AICC Round 0
+- Kaggle: https://www.kaggle.com/competitions/aicc-round-0-brain-tumor
+- AICC editorial: https://aicc-official.org/solutions/round-0/find-brain-tumors
+- Baseline notebook: https://www.kaggle.com/code/nikolatesla13/baseline-brain-tumor-aicc-round-0
 
 ## Task Statement
 
-TODO
+Classify brain CT images into 4 classes: no tumor plus 3 tumor types. The training set has roughly 2% labeled examples. Test images must receive class predictions.
+
+Restrictions from the task page: no manual labeling, no pretrained models except ResNet18, notebook runtime at most 20 minutes, fits on a P100 GPU.
+
+## Data
+
+- `train.csv`: `image_id`, `label`
+- `train/`: training images
+- `test/`: test images
 
 ## Evaluation
 
-TODO
+Macro F1.
 
 ## Submission Format
 
-TODO
+```csv
+ID,prediction
+0664,label
+1269,label
+```
+
+## Import Status
+
+Dataset downloaded and extracted. Baseline and reference artifacts downloaded.
+

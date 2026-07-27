@@ -1,1 +1,1 @@
-kaggle competitions submit -c deceptive-points-aicc-round-0 -f submission.csv  -m "Message"
+kaggle competitions submit -c deceptive-points-aicc-round-0 -f submission.csv  -m ""

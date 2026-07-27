@@ -2,67 +2,75 @@
 
 ## Status
 
-Current date: 2026-07-26. Departure/logistics date is 2026-07-31, so there are 6 calendar days remaining through 2026-07-31, including today. The last full study day is 2026-07-30, leaving 5 full study days including today. IOAI starts on 2026-08-02.
+Current date: 2026-07-27. Departure/logistics date is 2026-07-31, so there are 5 calendar days remaining through 2026-07-31, including today. The last full study day is 2026-07-30, leaving 4 full study days including today. IOAI starts on 2026-08-02.
 
-Pace since previous run: NO MEANINGFUL PROGRESS. Overall verdict: behind for IOAI readiness by departure. Biggest current bottleneck: IOAI 2026 Home Task 3 still has only random-baseline evidence and an interrupted strategy cell; it has not been converted into a serious bounded all-dev attempt.
+Pace since previous run: FAST. Overall verdict: still behind for IOAI readiness by departure, but the main blocker from the previous run was cleared. Biggest current bottleneck: official past IOAI task completion is still too thin, especially score-useful CV/counting and NLP submission work.
 
-Baseline used for comparison: the 2026-07-25 handoff already counted Home Task 1 audio adaptation, Home Task 2 full prediction validation, IOAI 2025 Concepts valid-format zero-score baseline, AICC corpus cataloging, and the three imported AICC folders. This run inspected recent file modifications, notebooks, outputs, task folders, AICC state, error journals, and git status. A study block counts only with visible IOAI-relevant evidence: metrics, predictions, saved submission files, checked model outputs, validated shape/file contracts, audio plots/features, masks/boxes, value/policy tables, or syllabus rows tied to runnable artifacts.
+Baseline used for comparison: previous automation run at 2026-07-27T07:12:00.773Z / local 2026-07-27 10:12. That run had Home Task 3 as the mandatory blocker because the then-current `MySolution` scored `0.0000`, below the random baseline `0.0161`. Already counted before that run: Home Task 1 audio adaptation, Home Task 2 full prediction validation, IOAI 2025 Concepts valid-format zero-score baseline, and AICC work through the imported 11-problem set.
+
+This run inspected recent modifications, `priority.md`, `ioai_syllabus.md`, `practice_queue.md`, `source_index.csv`, Home Task folders, IOAI 2025 Chicken Counting notebooks and disk outputs, AICC folders, task cards, error journal tail, notebook outputs, and git status.
 
 ## New Since Previous Run
 
-- No new visible IOAI-relevant artifact was found after the previous automation run at 2026-07-25T07:24:33.840Z.
-- `olympiads/competition_samples/raw/IOAI-2026-sparse/Home Task/problem3/Home-Task-3.ipynb` is still last modified on 2026-07-24 and still shows the random baseline on all 150 dev rows: mean score `0.0161`, solved rate `2.0%`, mean queries `14.89 / 15`. The later strategy work still ends with `KeyboardInterrupt`.
-- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/Concepts_baseline.ipynb` and `out/submission.zip` were modified on 2026-07-24 before the previous handoff. They remain valid-format but not score-useful: 30-row dev probe `Final Score: 0.0`, 50 `clues_a.jsonl` rows, 100 `clues_b.jsonl` rows, and zip members `clues_a.jsonl` / `clues_b.jsonl`.
-- No new AICC folder, notebook completion, submission zip, CSV, pkl, or metric table was found since the previous run.
+- `olympiads/competition_samples/raw/IOAI-2026-sparse/Home Task/problem3/Home-Task-3.ipynb` was modified on 2026-07-27 after the previous run.
+- New Home Task 3 evidence: greedy information-gathering `MySolution` precomputes `1472 animals x 70 questions`, ran 805 animal-question batches, and completed all 150 `dev.csv` rows.
+- Home Task 3 result: mean score `0.7764`, solved rate `99.3%`, mean queries `10.93 / 15`, wall time `172.3s`.
+- It now beats the random baseline `0.0161` by a wide margin and closes the previous mandatory blocker.
+- IOAI syllabus mapping: NLP; Pre-trained Language Models; LLM inference; information gathering/search; Model Evaluation; Data Processing.
+- Contest pattern trained: constrained query budget, baseline-first improvement, metric validation, runtime control, model-output interpretation, and failure inspection.
+- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Chicken_Counting/Chicken_Counting.ipynb` and `Chicken_Counting_Solution.ipynb` were touched on 2026-07-27, but visible outputs are old. Do not count this as new study progress unless the next run shows a new timestamped metric or regenerated disk output.
 
 Already counted before:
 
-- Home Task 1: audio loading, waveform/spectrogram inspection, AST input contract `(1, 1024, 128)`, AST adaptation on 920 combined rows, validation accuracy `78.51%`, `acc_old = 0.8`, `acc_new = 0.7678571428571429`, weighted score `0.7839285714285715`.
-- Home Task 2: 400 demonstrations, 200 validation scenarios, 1600 test scenarios, 5327 state-action samples, MLP training, rollout GIFs, `MLP {'success_rate': 0.92, 'avg_steps': 22.585, 'avg_invalid_pickup_or_dropoff': 0.0}`, and disk-validated `predictions.jsonl` / `predictions.zip`.
-- IOAI 2025 Concepts: local offline TF-IDF clue generator with 118 hint descriptions, embedding shape `(118, 3415)`, valid row counts, valid zip packaging, but `Final Score: 0.0`.
-- AICC: 27-task corpus exists; `deceptive-points`, `face-matching`, and `massive-problem` are imported. Only `deceptive-points` has submission-like CSV evidence. `face-matching` remains a CLIP/OOM debugging attempt, and `massive-problem` still has a `FileNotFoundError` path issue.
-- Data preprocessing fluency drill: executed notebook with tabular/text/image preprocessing checks and tiny CNN logits, useful for basic shape discipline but not the current scoring bottleneck.
+- Home Task 1: audio loading, waveform/spectrogram inspection, AST input contract `(1, 1024, 128)`, AST adaptation on 920 combined rows, validation accuracy `78.51%`, old/new retention score `0.7839285714285715`.
+- Home Task 2: 400 demonstrations, 200 validation scenarios, 1600 test scenarios, 5327 state-action samples, MLP training, rollout GIFs, `success_rate: 0.92`, and disk-validated `predictions.jsonl` / `predictions.zip`.
+- IOAI 2025 Concepts: local offline TF-IDF clue generator with valid row counts and valid zip packaging, but `Final Score: 0.0`.
+- IOAI 2025 Chicken Counting: older `submission.npz` and `score.json` exist with `public_a = 0.36787944117144233` and `private_b = 0.36787944117144233`; this is useful but was not new in this interval.
+- AICC: 11 imported / 27; about 9 attempted / 27 if partial/debug work counts; about 6 completed / 27 with executed notebook plus submission-like CSV evidence.
 
 ## Mandatory Coverage Buckets
 
-- IOAI syllabus: incomplete. Stronger artifact evidence exists for Python/NumPy/Pandas, data processing, scikit-learn, PyTorch basics, tensor manipulation, supervised learning, neural networks/MLP, model evaluation, audio processing, pretrained audio encoder use, model finetuning, imitation learning, and baseline NLP embeddings. Weak or missing as contest artifacts: object detection, segmentation, stronger pretrained vision/text encoders, completed CLIP/vision-text encoder workflow, autoencoders/GANs/diffusion, RL/search beyond Home Task 2 behavior cloning, and broader official past IOAI task completion.
-- Past IOAI tasks: underdone. IOAI 2025 Concepts has a valid-format but zero-score baseline. IOAI 2025 Chicken Counting, IOAI 2025 Radar/Restroom/Antique/Pixel, IOAI 2024 Help BOBAI, IOAI 2024 Lost in Hyperspace, and IOAI 2024 Madarian Cow remain unclosed or not recently advanced.
-- IOAI 2026 home tasks: mandatory and still not closed. Home Task 1 has credible audio adaptation evidence. Home Task 2 has valid full prediction artifacts. Home Task 3 is the blocking gap: random baseline only, no completed improved all-dev strategy.
-- AICC progress out of 27: 3 imported / 27; 3 attempted / 27 if counting setup/debugging; 1 completed / 27 with submission-like CSV evidence (`deceptive-points`). The corpus covers all 27 tasks but cataloging does not count as solved practice.
-- Audio coverage: acceptable minimum exists through Home Task 1: loading, waveform/spectrogram inspection, AST input contract, finetuning/adaptation, validation metric, and old-vs-new retention. A short AST-vs-Whisper/HuBERT when-to-use note is still useful but lower priority than Home Task 3.
+- IOAI syllabus: incomplete. Evidence exists for Python/NumPy/Pandas, data processing, scikit-learn, PyTorch basics, tensor manipulation, supervised learning, MLPs, model evaluation, audio processing, pretrained audio encoders, model finetuning, imitation learning, NLP/text encoders, LLM-style inference/search, vision-text embeddings, sequence tagging, and baseline time-series features. Weak/missing as score-useful contest artifacts: object detection, segmentation, completed pretrained vision classifier workflow, autoencoders/GANs/diffusion, RL/search beyond Home Task 2 behavior cloning and Home Task 3 query search, and broader official past IOAI task completion.
+- Past IOAI tasks: still underdone. Home Task 3 is now score-useful. IOAI 2025 Chicken Counting has an older low-score submission artifact, IOAI 2025 Concepts has a valid-format zero-score baseline, and IOAI 2025 Radar, Restroom, Antique, Pixel plus IOAI 2024 Help BOBAI, Lost in Hyperspace, and Madarian Cow remain unclosed or not recently advanced.
+- IOAI 2026 home tasks: mandatory bucket now much healthier. Home Task 1 has credible audio evidence. Home Task 2 has valid full prediction artifacts. Home Task 3 now has a score-useful all-dev run: mean `0.7764`, solved `99.3%`, mean queries `10.93 / 15`.
+- AICC progress out of 27: 11 imported / 27 (`buried-fault`, `deceptive-points`, `essay-gap`, `face-matching`, `find-brain-tumors`, `massive-problem`, `oriented-ship`, `polarity`, `shuffled`, `the-defected-nuts`, `word-lookups`). About 9 attempted / 27 if counting partial/debugging work. About 6 completed / 27 with executed notebook plus submission-like CSV evidence (`buried-fault`, `deceptive-points`, `essay-gap`, `polarity`, `shuffled`, `word-lookups`). `find-brain-tumors` remains partial unless the next run confirms its newer notebook/submission has no shape/index errors and has a validated score/submission contract.
+- Audio coverage: acceptable minimum exists through Home Task 1: loading, waveform/spectrogram inspection, AST input contract, adaptation/finetuning, validation metric, and old-vs-new retention. Add only a short saved when-to-use audio note if time allows; do not make audio the main block before official past IOAI gaps.
 
 ## Study Next
 
-1. Finish a serious IOAI 2026 Home Task 3 strategy.
-   - Target file/folder: `olympiads/competition_samples/raw/IOAI-2026-sparse/Home Task/problem3/Home-Task-3.ipynb`.
-   - Syllabus tag: NLP; Pre-trained Language Models; LLM inference; information gathering; search/decision strategy; Model Evaluation.
-   - Competition pattern trained: constrained query budget, metric validation, baseline-first improvement, runtime control, model-output interpretation, failure analysis.
-   - Required visible evidence: remove or bypass the interrupted all-animal precompute, run a deterministic or bounded strategy on all 150 `dev.csv` rows, print mean score, solved rate, mean queries, wall time, and at least five inspected failures, and beat the random baseline mean score `0.0161`.
-   - Why this is the highest-value next move: all IOAI 2026 home/platform tasks are mandatory, and Home Task 3 is the only one still without a serious score-useful attempt.
-   - Target schedule slot: 2026-07-26 first study block. No heavy work on 2026-07-31.
+1. Close IOAI 2025 Chicken Counting as a score-useful official CV/counting artifact.
+   - Target file/folder: `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Chicken_Counting/Chicken_Counting.ipynb`, `submission.npz`, and `score.json`.
+   - Syllabus tag: Computer Vision; Image Classification / Counting; Convolutional Layers; PyTorch Basics; Model Evaluation Metrics; Data Processing.
+   - Competition pattern trained: official past-task submission format, metric validation, disk artifact validation, baseline-first modeling, output interpretation.
+   - Required visible evidence: rerun a contestant-side notebook cell with current timestamp; print validation score/MSE/MAE or official-style score; reload `submission.npz` from disk and print its array keys/shapes; keep or improve above the current score `0.36787944117144233`.
+   - Why highest-value now: Home Task 3 is fixed, and the biggest IOAI syllabus gap is score-useful official CV execution under a real past-task contract.
+   - Target schedule slot: 2026-07-27 next study block. No heavy work on 2026-07-31.
 
-2. Only after Home Task 3 beats random, close one official past IOAI task with score usefulness or a tactical failure analysis.
+2. Optional stretch only after Chicken Counting has fresh validated evidence: improve or formally close IOAI 2025 Concepts.
    - Target file/folder: `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/Concepts_baseline.ipynb` and `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/out/`.
    - Syllabus tag: NLP; Text Encoders / embeddings; Language Modeling; Model Evaluation Metrics; Data Processing.
-   - Competition pattern trained: official past-task submission format, metric validation, local offline fallback, error analysis.
-   - Required visible evidence: improve the 30-example validation probe above `0.0` or save a concise failure-analysis note explaining why the offline TF-IDF clue generator fails; keep a valid `submission.zip` with 50 `clues_a.jsonl` rows and 100 `clues_b.jsonl` rows.
-   - Why this is the second highest-value next move: official past IOAI work is mandatory, and Concepts already has the file contract wired; the missing part is score usefulness or a deliberate close.
-   - Target schedule slot: 2026-07-26 second study block, only if Home Task 3 has a completed all-dev run beating random.
+   - Competition pattern trained: official past-task submission format, metric validation, offline fallback, error analysis.
+   - Required visible evidence: improve the validation probe above `0.0` or save a concise failure-analysis note explaining why the offline TF-IDF clue generator fails; keep valid `clues_a.jsonl`, `clues_b.jsonl`, and `submission.zip`.
+   - Why second: official past IOAI work is mandatory and this task already has the file contract wired.
+   - Target schedule slot: 2026-07-27 later block or 2026-07-28 first block only after Chicken Counting passes.
 
 ## Pass/Fail Check Before Next Run
 
-PASS: Home Task 3 saved notebook has a completed all-150-dev run with mean score greater than `0.0161`, solved rate and mean queries printed, no `KeyboardInterrupt` as the latest strategy output, and at least five inspected failures. Stretch pass: Concepts improves above `0.0` on the validation probe or has a saved failure-analysis close plus valid output files.
+PASS: `Chicken_Counting.ipynb` has a new visible run after 2026-07-27 16:00 local, `score.json` or printed metrics show a score at least `0.36787944117144233`, and `submission.npz` is reloaded from disk with array names/shapes printed.
 
-FAIL: work goes into new AICC imports, Chameleon exploration, CEOAI-only review, passive syllabus reading, archive cleanup, or another Home Task 3 precompute that does not finish inside a contest-sized block.
+STRETCH PASS: Concepts improves above `0.0` on the validation probe or has a saved failure-analysis close plus valid output files.
+
+FAIL: work goes into new AICC imports, CEOAI-only review, passive syllabus reading, archive cleanup, Home Task polishing, or Chicken Counting notebook edits without a fresh metric and disk-level submission check.
 
 ## Avoid Until This Is Done
 
-- Do not import more AICC problems before Home Task 3 has a serious bounded strategy.
+- Do not import more AICC problems before Chicken Counting has fresh validated evidence.
+- Do not continue AICC `find-brain-tumors` before the next official IOAI task is closed.
 - Do not continue Chameleon before Concepts is score-useful or formally closed.
-- Do not polish Home Task 1 beyond a short AST-vs-Whisper/HuBERT note unless a bug breaks the saved metric.
-- Do not redo Home Task 2 unless the existing `predictions.zip` stops validating.
-- Do not use data preprocessing drills as the main study block now; they are useful fluency work but not the current scoring bottleneck.
-- Do not study CEOAI syllabus as a primary target. CEOAI overlap counts only when tied to an IOAI artifact.
+- Do not polish Home Task 1 beyond a short audio model note unless a saved metric breaks.
+- Do not redo Home Task 2 unless `predictions.zip` stops validating.
+- Do not spend another main block on Home Task 3 unless the saved `0.7764` result is missing or broken.
+- Do not study CEOAI syllabus as the primary target. CEOAI overlap counts only when tied to an IOAI artifact.
 - Do not schedule heavy study on 2026-07-31; keep that date for departure, packing, offline files, account/platform checks, and rest.
 
 ## Evidence To Recheck
@@ -82,8 +90,10 @@ FAIL: work goes into new AICC imports, Chameleon exploration, CEOAI-only review,
 - `olympiads/competition_samples/raw/IOAI-2026-sparse/Home Task/problem2/predictions.zip`
 - `olympiads/competition_samples/raw/IOAI-2026-sparse/Home Task/problem3/Home-Task-3.ipynb`
 - `olympiads/competition_samples/raw/IOAI-2026-sparse/Home Task/problem3/dataset/`
+- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Chicken_Counting/Chicken_Counting.ipynb`
+- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Chicken_Counting/submission.npz`
+- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Chicken_Counting/score.json`
 - `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/Concepts_baseline.ipynb`
-- `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/Concepts_baseline-Copy1.ipynb`
 - `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/out/clues_a.jsonl`
 - `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/out/clues_b.jsonl`
 - `olympiads/competition_samples/raw/IOAI-2025-sparse/Individual-Contest/Concepts/out/submission.zip`
@@ -91,8 +101,13 @@ FAIL: work goes into new AICC imports, Chameleon exploration, CEOAI-only review,
 - `olympiads/competition_samples/raw/IOAI-2024-sparse/`
 - `olympiads/aicc/`
 - `olympiads/aicc/aicc_problem_corpus.md`
+- `olympiads/aicc/aicc_recommended_problem_order.md`
+- `olympiads/aicc/buried-fault/`
 - `olympiads/aicc/deceptive-points/`
-- `olympiads/aicc/face-matching/`
-- `olympiads/aicc/massive-problem/`
+- `olympiads/aicc/essay-gap/`
+- `olympiads/aicc/find-brain-tumors/`
+- `olympiads/aicc/polarity/`
+- `olympiads/aicc/shuffled/`
+- `olympiads/aicc/word-lookups/`
 - `olympiads/reviews/error_journal.jsonl`
 - `olympiads/reviews/ioai_error_journal.jsonl`

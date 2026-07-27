@@ -2,44 +2,42 @@
 
 ## Source
 
-- AICC/problem page: [AICC page](https://aicc-official.org/contests)
-- Kaggle competition: [Kaggle](https://www.kaggle.com/competitions/oriented-ship-aicc-round-7)
-- Raw AICC URL: https://aicc-official.org/contests
-- Raw Kaggle URL: https://www.kaggle.com/competitions/oriented-ship-aicc-round-7
+- AICC/problem page: https://aicc-official.org/contests
+- Kaggle competition: https://www.kaggle.com/competitions/oriented-ship-aicc-round-7
 - Platform: Kaggle
 - Contest: AICC Round 7
 - Difficulty: hard
 
 ## Local Artifacts
 
-- Original notebook: TODO
-- Working notebook copy: TODO
-- Data directory: D:\projects\Supervised-Learning-Experiments\olympiads\aicc\oriented-ship\data
-- Dataset status: TODO
+- Original notebook: `source/baseline-oriented-ships-aicc-round-7.ipynb`
+- Working notebook copy: `notebooks/oriented-ship_work.ipynb`
 - Reference solution: `notes/reference_solution.md`
-- Reference solution status: TODO
-- Submission script: `D:\projects\Supervised-Learning-Experiments\olympiads\aicc\oriented-ship\submission_script.bat`
+- Data directory: `data/`
+- Dataset status: downloaded and extracted
+- Submission script: `submission_script.bat`
 
 ## Task Shape
 
-- Task type: CV oriented object detection
-- Inputs: TODO
-- Outputs/submission format: TODO
-- Metric: TODO
+- Task type: oriented object detection
+- Inputs: aerial images and rotated-box labels
+- Outputs/submission format: confidence-ranked rotated boxes
+- Metric: mAP@0.5 with rotated IoU
 
 ## IOAI Syllabus Coverage
 
-- Primary coverage: TODO
-- Secondary coverage: TODO
-- Why this maps to the syllabus: TODO
+- Primary coverage: Object Detection; Pre-trained Vision Encoders; Image Augmentation; Model Evaluation Metrics
+- Secondary coverage: Tensor Manipulation; coordinate normalization
+- Competition pattern: detection dataset contract, rotated geometry, mAP scoring, submission syntax
 
 ## Notebook Data-Flow Check
 
-- Installs packages: TODO
-- Downloads/prepares dataset: TODO
-- Manual download needed: TODO
-- Evidence: TODO
+- Installs packages: no
+- Downloads/prepares dataset: no
+- Manual download needed: no
+- Evidence: dataset exists under `data/Oriented/`; baseline copy exists under `notebooks/`
 
 ## Next Action
 
-TODO
+Use as a hard pattern-recognition example. Do not implement first unless the goal is object-detection format exposure.
+

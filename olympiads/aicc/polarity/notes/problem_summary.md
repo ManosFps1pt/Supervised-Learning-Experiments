@@ -2,44 +2,43 @@
 
 ## Source
 
-- AICC/problem page: [AICC page](https://aicc-official.org/contests)
-- Kaggle competition: [Kaggle](https://www.kaggle.com/competitions/polarity-aicc-round-7)
-- Raw AICC URL: https://aicc-official.org/contests
-- Raw Kaggle URL: https://www.kaggle.com/competitions/polarity-aicc-round-7
+- AICC/problem page: https://aicc-official.org/contests
+- Kaggle competition: https://www.kaggle.com/competitions/polarity-aicc-round-7
+- Official solution notebook: https://github.com/AI-Community-Contest/solutions/blob/main/round-7/polarity.ipynb
 - Platform: Kaggle
 - Contest: AICC Round 7
 - Difficulty: medium
 
 ## Local Artifacts
 
-- Original notebook: TODO
-- Working notebook copy: TODO
-- Data directory: D:\projects\Supervised-Learning-Experiments\olympiads\aicc\polarity\data
-- Dataset status: TODO
+- Original notebook: `source/baseline-polarity-aicc-round-7.ipynb`
+- Working notebook copy: `notebooks/polarity_work.ipynb`
 - Reference solution: `notes/reference_solution.md`
-- Reference solution status: TODO
-- Submission script: `D:\projects\Supervised-Learning-Experiments\olympiads\aicc\polarity\submission_script.bat`
+- Data directory: `data/`
+- Dataset status: downloaded and extracted
+- Submission script: `submission_script.bat`
 
 ## Task Shape
 
-- Task type: NLP lexical classification
-- Inputs: TODO
-- Outputs/submission format: TODO
-- Metric: TODO
+- Task type: NLP lexical binary classification
+- Inputs: word pairs
+- Outputs/submission format: `row_id,label`
+- Metric: macro F1
 
 ## IOAI Syllabus Coverage
 
-- Primary coverage: TODO
-- Secondary coverage: TODO
-- Why this maps to the syllabus: TODO
+- Primary coverage: NLP Text Classification; Pre-trained Text Encoders; Transformers; Data Embeddings
+- Secondary coverage: Model Evaluation Metrics; few-shot validation
+- Competition pattern: restriction checking, tiny train set, binary macro-F1, pretrained-model input contract
 
 ## Notebook Data-Flow Check
 
-- Installs packages: TODO
-- Downloads/prepares dataset: TODO
-- Manual download needed: TODO
-- Evidence: TODO
+- Installs packages: no
+- Downloads/prepares dataset: no
+- Manual download needed: no
+- Evidence: baseline reads Kaggle train/test CSV paths; dataset exists under `data/`
 
 ## Next Action
 
-TODO
+Use for pretrained-text-encoder pattern recognition after Essay Gap.
+

@@ -2,44 +2,43 @@
 
 ## Source
 
-- AICC/problem page: [AICC page](https://aicc-official.org/contests)
-- Kaggle competition: [Kaggle](https://www.kaggle.com/competitions/aicc-round-0-brain-tumor)
-- Raw AICC URL: https://aicc-official.org/contests
-- Raw Kaggle URL: https://www.kaggle.com/competitions/aicc-round-0-brain-tumor
+- AICC/problem page: https://aicc-official.org/contests
+- Kaggle competition: https://www.kaggle.com/competitions/aicc-round-0-brain-tumor
+- AICC editorial: https://aicc-official.org/solutions/round-0/find-brain-tumors
 - Platform: Kaggle
 - Contest: AICC Round 0
 - Difficulty: medium
 
 ## Local Artifacts
 
-- Original notebook: TODO
-- Working notebook copy: TODO
-- Data directory: D:\projects\Supervised-Learning-Experiments\olympiads\aicc\find-brain-tumors\data
-- Dataset status: TODO
+- Original notebook: `source/baseline-brain-tumor-aicc-round-0.ipynb`
+- Working notebook copy: `notebooks/find-brain-tumors_work.ipynb`
 - Reference solution: `notes/reference_solution.md`
-- Reference solution status: TODO
-- Submission script: `D:\projects\Supervised-Learning-Experiments\olympiads\aicc\find-brain-tumors\submission_script.bat`
+- Data directory: `data/`
+- Dataset status: downloaded and extracted
+- Submission script: `submission_script.bat`
 
 ## Task Shape
 
-- Task type: CV image classification
-- Inputs: TODO
-- Outputs/submission format: TODO
-- Metric: TODO
+- Task type: CV image classification with scarce labels
+- Inputs: CT image files plus `train.csv`
+- Outputs/submission format: `ID,prediction`
+- Metric: macro F1
 
 ## IOAI Syllabus Coverage
 
-- Primary coverage: TODO
-- Secondary coverage: TODO
-- Why this maps to the syllabus: TODO
+- Primary coverage: Image Classification; Pre-trained Vision Encoders; Image Augmentation; Model Finetuning
+- Secondary coverage: PyTorch Basics; Data Processing; Model Evaluation Metrics
+- Competition pattern: image loading, label joins, scarce-label baseline, macro-F1 discipline, submission CSV validation
 
 ## Notebook Data-Flow Check
 
-- Installs packages: TODO
-- Downloads/prepares dataset: TODO
-- Manual download needed: TODO
-- Evidence: TODO
+- Installs packages: no
+- Downloads/prepares dataset: no
+- Manual download needed: no
+- Evidence: dataset exists under `data/`; baseline copy exists under `notebooks/`
 
 ## Next Action
 
-TODO
+Use for baseline-recognition drill first; run only after writing your own four-line baseline idea.
+
