@@ -89,12 +89,17 @@ Write-Host 'Configuring Tailscale Serve...' -ForegroundColor Cyan
 if ($LASTEXITCODE -ne 0) { throw "Tailscale Serve failed with exit code $LASTEXITCODE." }
 
 Start-Sleep -Seconds 5
+$statusJson = & $Tailscale status --json 2>$null
+if ($LASTEXITCODE -ne 0) { throw 'Could not read the local Tailscale status.' }
+$tailscaleDnsName = [string](($statusJson | ConvertFrom-Json).Self.DNSName).TrimEnd('.')
+if ([string]::IsNullOrWhiteSpace($tailscaleDnsName)) { throw 'Tailscale did not report a DNS name for this machine.' }
 $taskInfo = schtasks.exe /Query /TN $TaskName /FO LIST /V 2>&1
 Write-Host ''
 Write-Host 'Remote access activated.' -ForegroundColor Green
-Write-Host 'SSH:     ssh Manos@pc.tail953190.ts.net'
-Write-Host 'Jupyter: https://pc.tail953190.ts.net'
+Write-Host "SSH:     ssh $env:USERNAME@$tailscaleDnsName"
+Write-Host "Jupyter: https://$tailscaleDnsName"
 Write-Host "Task:    $TaskName ($taskUser, S4U, startup)"
+Write-Host "Tailscale machine DNS name: $tailscaleDnsName"
 Write-Host "Log:     $JupyterLog"
 Write-Host ($taskInfo | Select-String -Pattern 'Run As User|Logon Mode|Status|Last Result')
 Write-Host ''
